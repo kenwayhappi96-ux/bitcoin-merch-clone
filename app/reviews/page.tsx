@@ -7,7 +7,7 @@ export default function ReviewsPage() {
     <main className="min-h-screen bg-white py-12">
       {/* Gauche : Note globale + Trustpilot */}
       <div className="w-full flex justify-center items-center">
-        <Link href='/' className="relative text-black! text-center">
+        <Link href='/' className="relative text-black! text-center review">
           <div className='flex gap-2 w-full items-center'>
             <span className="text-[24px] block font-medium">Excellent</span>
             <span className="w-36.5 block">

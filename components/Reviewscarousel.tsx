@@ -56,7 +56,7 @@ const ReviewsCarousel = () => {
         {reviews.map((review, idx) => (
           <div
             key={idx}
-            className="relative max-w-76.75 inline-block h-27.5 mr-3.75 mb-2.5 pb-5 whitespace-normal [vertical-align: top;]"
+            className="relative bg-gray-100 max-w-76.75 inline-block h-27.5 mr-3.75 mb-2.5 pb-5 whitespace-normal [vertical-align: top;]"
           >
             {/* Stars + Verified */}
             <div className="flex items-center gap-4">
@@ -93,8 +93,8 @@ const ReviewsCarousel = () => {
                 </div>
 
               {review.isVerified && 
-              <span className="inline-flex gap-1 text-sm text-gray-600">
-                <CheckCircle2 className="w-4 h-4 text-gray-600" />
+              <span className="flex items-center gap-1 text-sm text-gray-600">
+                <CheckCircle2 className="w-4 h-4 text-white fill-gray-600" />
                 Verified
               </span>
               }

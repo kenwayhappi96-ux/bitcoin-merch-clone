@@ -149,3 +149,91 @@ export const contact_method = [
         link: 'https://t.me/bitcoinmerch'
     },
 ]
+
+export const slides = [
+  {
+    id: 1,
+    image: '/ref/c1.JPG',
+    title: 'Join the Battle Pass',
+    subtitle: 'Exclusive rewards and mining benefits',
+    link: '/battle-pass',
+    buttonText: 'Shop Now'
+  },
+  {
+    id: 2,
+    image: '/ref/c2.JPG',
+    title: 'Must Go Warehouse Miners',
+    subtitle: 'Limited stock clearance on premium equipment',
+    link: '/collections/lucky-miners',
+    buttonText: 'Shop Now'
+  },
+  {
+    id: 3,
+    image: '/ref/c3.JPG',
+    title: 'Free Shipping on Orders $400+',
+    subtitle: 'Fast delivery on all mining equipment',
+    link: '/collections/bitaxe-miners',
+    buttonText: 'Shop Now'
+  },
+  {
+    id: 4,
+    image: '/ref/c4.JPG',
+    title: 'Visit Our Store',
+    subtitle: 'California warehouse - Open for pickup',
+    link: '/support',
+    buttonText: 'Learn More'
+  },
+  {
+    id: 5,
+    image: '/ref/c5.JPG',
+    title: 'Pay with Crypto',
+    subtitle: 'Bitcoin, Ethereum, and more accepted',
+    link: '/',
+    buttonText: 'Shop Now'
+  }
+]
+
+export const reviews = [
+  {
+    title: "Chris helped me get my Mars Lander v2...",
+    text: "Chris helped me get my Mars Lander v2 back in action. Great support! Thanks guys",
+    author: "Andreas",
+    date: "2 days ago",
+    isVerified: false,
+  },
+  {
+    title: "Fast shipping",
+    text: "Fast shipping, good product, local USA. Also joined Legend Battle Pass.",
+    author: "Myles Nolte",
+    date: "January 7",
+    isVerified: true,
+  },
+  {
+    title: "All good Albert got me taken care of!",
+    text: "My first order went well. Second one had was a bit slow on hearing any...",
+    author: "Not to impressed",
+    date: "January 7",
+    isVerified: true,
+  },
+  {
+    title: "All good Albert got me taken care of!",
+    text: "My first order went well. Second one had was a bit slow on hearing any...",
+    author: "Not to impressed",
+    date: "January 7",
+    isVerified: true,
+  },
+  {
+    title: "All good Albert got me taken care of!",
+    text: "My first order went well. Second one had was a bit slow on hearing any...",
+    author: "Not to impressed",
+    date: "January 7",
+    isVerified: true,
+  },
+  {
+    title: "Great experience",
+    text: "Order came in about 10 days and everything was perfect.",
+    author: "John",
+    date: "December 27",
+    isVerified: false,
+  },
+];

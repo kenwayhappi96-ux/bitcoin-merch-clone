@@ -184,6 +184,43 @@ a:hover {
     margin: 32px 0;
 }
 
+.wrapper_left a:hover, .review{
+  text-decoration: none !important;
+}
+
+/* .tp-stars--4--half .tp-star:nth-of-type(-n + 4) .tp-star__canvas, .tp-stars--4--half .tp-star:nth-of-type(-n + 4) .tp-star__canvas--half {
+    fill: #00b67a !important;
+}
+.tp-stars--4 .tp-star:nth-of-type(-n + 4) .tp-star__canvas, .tp-stars--4 .tp-star:nth-of-type(-n + 4) .tp-star__canvas--half {
+    fill: #73cf11;
+}
+.tp-stars .tp-star__canvas, .tp-stars .tp-star__canvas--half {
+    fill: #dcdce6;
+}
+
+.tp-stars .tp-star__shape {
+    fill: #fff;
+} */
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.wrapper_left {
+    float: left;
+    width: 400px;
+}
+
+@media screen and (min-width: 1175px) {
+    .tp-widget-wrapper .wrapper-right {
+        width: calc(100% - 200px) !important;
+    }
+}
+
 @media screen and (min-width: 641px) {
     .footer-copyrightt:not(:only-child) {
         margin-top: 34px !important;
@@ -195,5 +232,12 @@ a:hover {
     .h2, .rte h2 {
       font-size: 25px;
       line-height: 1.5;
+    }
+}
+
+@media screen and (min-width: 520px) {
+    .tp-widget-wrapper .wrapper_left {
+        float: left;
+        width: 200px;
     }
 }

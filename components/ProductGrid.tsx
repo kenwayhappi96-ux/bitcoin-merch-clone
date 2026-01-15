@@ -4,6 +4,7 @@ import { useState } from 'react'
 import ProductCard from './ProductCard'
 import ProductListItem from './ProductListItem'
 import ProductFilters from './ProductFilters'
+import ProductCardOptions from './ProductCardOptions'
 
 interface Product {
   id: number
@@ -71,13 +72,13 @@ export default function ProductGrid({ initialProducts }: ProductGridProps) {
 
       <div className={
         view === 'grid' 
-          ? 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6'
-          : 'flex flex-col gap-6'
+          ? 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-0'
+          : 'flex flex-col gap-0'
       }>
         {products.map((product) => (
           view === 'grid' 
-            ? <ProductCard key={product.id} product={product} />
-            : <ProductListItem key={product.id} product={product} />
+            ? <ProductCardOptions key={product.id} product={product} />
+            : <ProductCardOptions key={product.id} product={product} isRow />
         ))}
       </div>
     </>

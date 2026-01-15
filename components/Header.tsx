@@ -101,9 +101,11 @@ export default function Header() {
                   `}
                 >
                   <div className="p-4 space-y-3">
-                    <button className="w-full bg-[#FF8C00] text-white py-2 rounded">
-                      LOGIN
-                    </button>
+                    <div className="w-full! bg-[#FF8C00] text-white! uppercase py-2 rounded text-center">
+                      <Link href={'/login'} className="text-white!">
+                        LOGIN
+                      </Link>
+                    </div>
                     <p className="text-sm">
                       New customer? <span className="text-[#FF8C00]">Create your account</span>
                     </p>
@@ -126,9 +128,11 @@ export default function Header() {
                   `}
                 >
                   <div className="p-4 space-y-3">
-                    <button className="w-full bg-[#FF8C00] text-white py-2 rounded">
-                      LOGIN
-                    </button>
+                    <div className="w-full! bg-[#FF8C00] text-white! uppercase py-2 rounded text-center">
+                      <Link href={'/login'} className="text-white!">
+                        LOGIN
+                      </Link>
+                    </div>
                     <p className="text-sm">
                       New customer? <span className="text-[#FF8C00]">Create your account</span>
                     </p>

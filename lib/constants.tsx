@@ -122,3 +122,30 @@ export const nav_link =[
         icon:LifeBuoy
     },
 ]
+
+export const contact_method = [
+    {
+        name:'Call Us',
+        icon:'📞',
+        val:'(877) 5000-BTC',
+        info:'Fastest support',
+        btn:'Call now',
+        link: 'tel:8775000282'
+    },
+    {
+        name:'Email Support',
+        icon:'✉️',
+        val:'support@bitcoinmerch.com',
+        info:'Response within 24 hours',
+        btn:'Send Email',
+        link: 'mailto:support@bitcoinmerch.com'
+    },
+    {
+        name:'Chat & Telegram',
+        icon:'💬',
+        val:'Live chat or join our community',
+        info:``,
+        btn:'Join Telegram',
+        link: 'https://t.me/bitcoinmerch'
+    },
+]

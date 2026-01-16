@@ -32,7 +32,7 @@ export default function Header() {
   return (
     <>
       {/* Top Section - Sticky (reste visible) */}
-      <div className="sticky top-0 z-50 bg-[#3b82f6] text-white shadow-lg border-b border-white/20">
+      <div className="sticky top-0 z-50 bg-[#0036cc] text-white shadow-lg border-b border-white/20">
         <div className="w-full max-w-[90%] mx-auto px-5 py-4">
           <div className="flex items-center justify-between gap-4">
             <div className="flex items-center gap-3">
@@ -46,22 +46,28 @@ export default function Header() {
                   alt="Bitcoin Merch" 
                   width={200}
                   height={60}
-                  className="h-20 w-auto"
+                  className="h-10 sm:h-12 md:h-14 lg:h-16 w-auto object-contain"
                 />
               </Link>
             </div>
 
-            <form onSubmit={handleSearch} className="flex-1 max-w-4xl mx-6 hidden md:block">
+            <form
+              onSubmit={handleSearch}
+              className="flex-1 hidden md:block"
+            >
               <div className="relative">
                 <input
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Search products..."
-                  className="w-full pl-5 pr-14 py-3 bg-white text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#FF8C00] text-lg"
+                  placeholder="Search..."
+                  className="w-full pl-5 pr-16 py-3 bg-white text-black rounded-md focus:ring-2 focus:ring-[#FF8C00]"
                 />
-                <button type="submit" className={`absolute right-2 top-1/2 -translate-y-1/2 bg-[#FF8C00] text-white p-2.5 hover:bg-[#ff9d1f] transition ${isSearching ? 'animate-spin' : ''}`}>
-                  <Search className="w-5 h-5" />
+                <button
+                  type="submit"
+                  className="absolute right-0 top-0 h-full px-4 bg-[#FF8C00] rounded-r-md flex items-center justify-center"
+                >
+                  <Search className="w-5 h-5 text-white" />
                 </button>
               </div>
             </form>
@@ -234,7 +240,7 @@ export default function Header() {
       </div>
 
       {/* Bottom Menu - Disparait au scroll */}
-      <div className="bg-[#3b82f6] text-white border-t border-white/10 hidden md:block">
+      <div className="bg-[#0036cc] text-white border-t border-white/10 hidden md:block">
         <div className="w-full max-w-[90%] mx-auto px-5">
           <div className="flex items-center justify-between py-4">
             <nav className="flex items-center gap-10 flex-wrap">

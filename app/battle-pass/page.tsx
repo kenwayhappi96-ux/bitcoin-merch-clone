@@ -1,191 +1,148 @@
-import Link from 'next/link'
-import { Trophy, Star, Zap, Gift, Users, TrendingUp } from 'lucide-react'
+import { Trophy, Star, Gift, TrendingUp } from 'lucide-react'
+import ProductGrid from '@/components/ProductGrid'
 
-export default function BattlePassPage() {
+async function getProducts() {
+  try {
+    const res = await fetch('http://localhost:3000/api/products', {
+      cache: 'no-store'
+    })
+    
+    if (!res.ok) {
+      return { success: false, products: [] }
+    }
+    
+    return await res.json()
+  } catch (error) {
+    console.error('Error fetching products:', error)
+    return { success: false, products: [] }
+  }
+}
+
+export default async function BattlePassPage() {
+  const data = await getProducts()
+  const allProducts = data.products || []
+  
+  // Filtrer les produits de la catégorie Battle Pass (category_id = 3)
+  const battlePassProducts = allProducts.filter((p: any) => 
+    p.category_id === 3 || p.category === 'Battle Pass'
+  )
+  
+  const mainBattlePass = battlePassProducts[0]
+
   return (
     <main className="min-h-screen bg-gray-50">
-      <div className="bg-gradient-to-r from-[#FF8C00] to-[#ff9d1f] text-white py-20 px-4">
-        <div className="max-w-6xl mx-auto text-center">
-          <div className="flex justify-center mb-6">
-            <Trophy className="w-20 h-20" />
-          </div>
-          <h1 className="text-5xl md:text-6xl font-bold mb-4">Bitcoin Merch Battle Pass</h1>
-          <p className="text-2xl mb-8 text-orange-100">
-            Unlock exclusive rewards, discounts, and mining benefits
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <button className="bg-white text-[#FF8C00] px-8 py-4 rounded-lg text-xl font-bold hover:bg-gray-100 transition shadow-lg">
-              Join Now - $29.99/month
-            </button>
-            <button className="bg-transparent border-2 border-white text-white px-8 py-4 rounded-lg text-xl font-bold hover:bg-white/10 transition">
-              Learn More
-            </button>
-          </div>
+      {/* Hero Section */}
+      <div className="bg-gradient-to-r from-orange-500 to-orange-600 py-16 px-4">
+        <div className="max-w-7xl mx-auto">
+          {mainBattlePass ? (
+            <>
+              <div className="flex justify-center mb-6">
+                {mainBattlePass.image ? (
+                  <img 
+                    src={mainBattlePass.image} 
+                    alt={mainBattlePass.name}
+                    className="w-48 h-48 object-contain"
+                  />
+                ) : (
+                  <Trophy className="w-16 h-16" />
+                )}
+              </div>
+              <div className="text-center text-white">
+                <h1 className="text-4xl md:text-5xl font-bold mb-3">
+                  {mainBattlePass.name}
+                </h1>
+                <div className="flex items-center justify-center gap-3 mb-4">
+                  <span className="text-3xl font-bold">
+                    ${mainBattlePass.price}
+                  </span>
+                  {mainBattlePass.compare_at_price && (
+                    <span className="text-2xl line-through opacity-75">
+                      ${mainBattlePass.compare_at_price}
+                    </span>
+                  )}
+                </div>
+                <p className="text-xl mb-8 max-w-3xl mx-auto">
+                  {mainBattlePass.description || 'Devenez un pionnier de la communauté minière à domicile. Rejoignez l\'abonnement mensuel exclusif.'}
+                </p>
+                <button className="bg-orange-600 hover:bg-orange-700 text-white px-8 py-4 rounded-lg text-lg font-bold transition shadow-lg">
+                  Obtenir votre Battle Pass
+                </button>
+              </div>
+            </>
+          ) : (
+            <div className="text-center text-white">
+              <div className="flex justify-center mb-6">
+                <Trophy className="w-16 h-16" />
+              </div>
+              <h1 className="text-4xl md:text-5xl font-bold">Battle Pass</h1>
+              <p className="text-xl mt-4">Chargement...</p>
+            </div>
+          )}
         </div>
       </div>
 
-      <section className="py-16 px-4">
+      {/* Membership Perks Section - 3 avantages seulement */}
+      <section className="py-16 px-4 bg-white">
         <div className="max-w-6xl mx-auto">
-          <h2 className="text-4xl font-bold text-center text-gray-800 mb-12">Battle Pass Benefits</h2>
+          <h2 className="text-4xl font-bold text-center mb-12">
+            Avantages du Battle Pass
+          </h2>
           
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            <div className="bg-white p-8 rounded-lg shadow-md hover:shadow-xl transition">
-              <div className="flex justify-center mb-4">
-                <div className="bg-blue-100 p-4 rounded-full">
-                  <Star className="w-10 h-10 text-[#3b82f6]" />
-                </div>
-              </div>
-              <h3 className="text-2xl font-bold text-gray-800 mb-3 text-center">Exclusive Discounts</h3>
-              <p className="text-gray-600 text-center">
-                Get 15% off all miners, 20% off accessories, and early access to new product launches.
-              </p>
-            </div>
-
-            <div className="bg-white p-8 rounded-lg shadow-md hover:shadow-xl transition">
+          <div className="grid md:grid-cols-3 gap-8">
+            <div className="bg-gray-50 p-8 rounded-lg">
               <div className="flex justify-center mb-4">
                 <div className="bg-orange-100 p-4 rounded-full">
-                  <Zap className="w-10 h-10 text-[#FF8C00]" />
+                  <Star className="w-12 h-12 text-orange-600" />
                 </div>
               </div>
-              <h3 className="text-2xl font-bold text-gray-800 mb-3 text-center">Priority Support</h3>
+              <h3 className="text-2xl font-bold text-gray-800 mb-3 text-center">
+                15% de réduction sur la plupart des articles du magasin
+              </h3>
               <p className="text-gray-600 text-center">
-                24/7 dedicated support line, faster response times, and direct access to our technical team.
+                15% de réduction sur les mineurs Bitaxe et les pièces détachées/mises à niveau Bitaxe - Tous les produits dérivés Bitcoin sous "Mineurs de loterie exclusifs" - Articles en magasin et "Meilleures ventes" comme des t-shirts, des coussins et plus encore.
               </p>
             </div>
 
-            <div className="bg-white p-8 rounded-lg shadow-md hover:shadow-xl transition">
+            <div className="bg-gray-50 p-8 rounded-lg">
+              <div className="flex justify-center mb-4">
+                <div className="bg-blue-100 p-4 rounded-full">
+                  <Gift className="w-12 h-12 text-blue-600" />
+                </div>
+              </div>
+              <h3 className="text-2xl font-bold text-gray-800 mb-3 text-center">
+                Mineur gratuit chaque mois
+              </h3>
+              <p className="text-gray-600 text-center">
+                Lors de votre première commande en tant que membre Bitcoin Battle Pass, nous inclurons un cadeau aléatoire gratuit (Bitaxe, pépite d'or, etc.) et un mineur gratuit livré à votre domicile chaque mois.
+              </p>
+            </div>
+
+            <div className="bg-gray-50 p-8 rounded-lg">
               <div className="flex justify-center mb-4">
                 <div className="bg-green-100 p-4 rounded-full">
-                  <Gift className="w-10 h-10 text-green-600" />
+                  <TrendingUp className="w-12 h-12 text-green-600" />
                 </div>
               </div>
-              <h3 className="text-2xl font-bold text-gray-800 mb-3 text-center">Monthly Rewards</h3>
+              <h3 className="text-2xl font-bold text-gray-800 mb-3 text-center">
+                Réduction cumulable
+              </h3>
               <p className="text-gray-600 text-center">
-                Earn points with every purchase and unlock free accessories, gift cards, and special perks.
-              </p>
-            </div>
-
-            <div className="bg-white p-8 rounded-lg shadow-md hover:shadow-xl transition">
-              <div className="flex justify-center mb-4">
-                <div className="bg-purple-100 p-4 rounded-full">
-                  <Users className="w-10 h-10 text-purple-600" />
-                </div>
-              </div>
-              <h3 className="text-2xl font-bold text-gray-800 mb-3 text-center">Community Access</h3>
-              <p className="text-gray-600 text-center">
-                Join our private Discord server with expert miners, exclusive AMAs, and live mining tutorials.
-              </p>
-            </div>
-
-            <div className="bg-white p-8 rounded-lg shadow-md hover:shadow-xl transition">
-              <div className="flex justify-center mb-4">
-                <div className="bg-red-100 p-4 rounded-full">
-                  <TrendingUp className="w-10 h-10 text-red-600" />
-                </div>
-              </div>
-              <h3 className="text-2xl font-bold text-gray-800 mb-3 text-center">Pool Benefits</h3>
-              <p className="text-gray-600 text-center">
-                0% pool fees for Battle Pass members on our official mining pool with enhanced payouts.
-              </p>
-            </div>
-
-            <div className="bg-white p-8 rounded-lg shadow-md hover:shadow-xl transition">
-              <div className="flex justify-center mb-4">
-                <div className="bg-yellow-100 p-4 rounded-full">
-                  <Trophy className="w-10 h-10 text-yellow-600" />
-                </div>
-              </div>
-              <h3 className="text-2xl font-bold text-gray-800 mb-3 text-center">Exclusive Merchandise</h3>
-              <p className="text-gray-600 text-center">
-                Limited edition t-shirts, stickers, and mining gear only available to Battle Pass members.
+                Réduction cumulable à volonté. 20% de réduction sur une sélection de produits dès 2 articles achetés. Offre valable sur l'ensemble du magasin pendant les soldes de fin d'année.
               </p>
             </div>
           </div>
         </div>
       </section>
 
-      <section className="py-16 px-4 bg-white">
-        <div className="max-w-4xl mx-auto">
-          <h2 className="text-4xl font-bold text-center text-gray-800 mb-12">Pricing Plans</h2>
-          
-          <div className="grid md:grid-cols-2 gap-8">
-            <div className="border-2 border-gray-200 rounded-xl p-8 hover:border-[#3b82f6] transition">
-              <h3 className="text-2xl font-bold text-gray-800 mb-2">Monthly Pass</h3>
-              <div className="text-5xl font-bold text-gray-800 mb-6">
-                $29<span className="text-2xl text-gray-600">.99/mo</span>
-              </div>
-              <ul className="space-y-3 mb-8">
-                <li className="flex items-start gap-2">
-                  <Star className="w-5 h-5 text-[#FF8C00] flex-shrink-0 mt-1" />
-                  <span className="text-gray-700">All Battle Pass benefits</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <Star className="w-5 h-5 text-[#FF8C00] flex-shrink-0 mt-1" />
-                  <span className="text-gray-700">15% discount on all products</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <Star className="w-5 h-5 text-[#FF8C00] flex-shrink-0 mt-1" />
-                  <span className="text-gray-700">Monthly reward points</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <Star className="w-5 h-5 text-[#FF8C00] flex-shrink-0 mt-1" />
-                  <span className="text-gray-700">Cancel anytime</span>
-                </li>
-              </ul>
-              <button className="w-full bg-[#3b82f6] text-white py-4 rounded-lg font-bold text-lg hover:bg-[#2563eb] transition">
-                Subscribe Monthly
-              </button>
-            </div>
-
-            <div className="border-4 border-[#FF8C00] rounded-xl p-8 relative bg-gradient-to-br from-orange-50 to-white">
-              <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-[#FF8C00] text-white px-4 py-1 rounded-full font-bold">
-                BEST VALUE
-              </div>
-              <h3 className="text-2xl font-bold text-gray-800 mb-2">Annual Pass</h3>
-              <div className="text-5xl font-bold text-gray-800 mb-2">
-                $299<span className="text-2xl text-gray-600">.99/yr</span>
-              </div>
-              <p className="text-green-600 font-semibold mb-6">Save $60 per year!</p>
-              <ul className="space-y-3 mb-8">
-                <li className="flex items-start gap-2">
-                  <Star className="w-5 h-5 text-[#FF8C00] flex-shrink-0 mt-1" />
-                  <span className="text-gray-700">All Monthly Pass benefits</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <Star className="w-5 h-5 text-[#FF8C00] flex-shrink-0 mt-1" />
-                  <span className="text-gray-700">20% discount on all products</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <Star className="w-5 h-5 text-[#FF8C00] flex-shrink-0 mt-1" />
-                  <span className="text-gray-700">2x reward points multiplier</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <Star className="w-5 h-5 text-[#FF8C00] flex-shrink-0 mt-1" />
-                  <span className="text-gray-700">Free exclusive merchandise pack</span>
-                </li>
-              </ul>
-              <button className="w-full bg-[#FF8C00] text-white py-4 rounded-lg font-bold text-lg hover:bg-[#ff9d1f] transition shadow-lg">
-                Subscribe Annually
-              </button>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section className="py-16 px-4 bg-gradient-to-r from-[#3b82f6] to-[#2563eb] text-white">
+      {/* CTA Section */}
+      <section className="py-16 px-4 bg-gradient-to-r from-orange-500 to-orange-600 text-white">
         <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-4xl font-bold mb-6">Ready to Level Up Your Mining?</h2>
-          <p className="text-xl mb-8 text-blue-100">
-            Join thousands of miners already enjoying Battle Pass benefits
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <button className="bg-[#FF8C00] text-white px-8 py-4 rounded-lg text-lg font-bold hover:bg-[#ff9d1f] transition">
-              Start Your Free Trial
-            </button>
-            <Link href="/support" className="bg-white text-[#3b82f6] px-8 py-4 rounded-lg text-lg font-bold hover:bg-gray-100 transition">
-              Contact Sales
-            </Link>
-          </div>
+          <h2 className="text-4xl font-bold mb-6">
+            Ajoutez votre Battle Pass au panier
+          </h2>
+          <button className="bg-white text-orange-600 px-10 py-5 rounded-lg text-xl font-bold hover:bg-gray-100 transition shadow-lg">
+            Rejoindre maintenant
+          </button>
         </div>
       </section>
     </main>

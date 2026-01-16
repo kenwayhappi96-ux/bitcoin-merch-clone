@@ -47,7 +47,6 @@ export default function Header() {
                   alt="Bitcoin Merch"
                   width={200}
                   height={60}
-                  priority
                   className="h-10 sm:h-12 md:h-14 lg:h-16 w-auto object-contain"
                 />
               </Link>
@@ -240,18 +239,46 @@ export default function Header() {
       </div>
 
       {/* Bottom Menu - Disparait au scroll */}
-      <div className="bg-[#0036cc] border-t border-white/10 hidden md:block">
+      <div className="bg-[#0036cc] text-white border-t border-white/10 hidden md:block">
         <div className="w-full max-w-[90%] mx-auto px-5">
-          <div className="flex items-center justify-between">
-            <nav className="flex items-center gap-10 text-[13px] md:text-[14px]">
-              {
-                nav_link.map((item, index)=>(
-                  <Link key={index} href={item.link} className="flex items-center gap-[0.4em] text-white!">
-                    <item.icon className="w-[14.4px] h-[14.4px] shrink-0 font-black" />
-                    <span className='text-white'>{item.name}</span>
-                  </Link>
-                ))
-              }
+          <div className="flex items-center justify-between py-4">
+            <nav className="flex items-center gap-10 flex-wrap">
+              <Link href="/collections/lucky-miners" className="flex items-center gap-1.5 text-base font-semibold hover:text-[#FF8C00] transition">
+                <Pickaxe className="w-5 h-5 flex-shrink-0" />
+                <div className="flex flex-col leading-tight">
+                  <span>Mineurs chanceux</span>
+                </div>
+              </Link>
+              <Link href="/collections/bitaxe-miners" className="flex items-center gap-1.5 text-base font-semibold hover:text-[#FF8C00] transition">
+                <Box className="w-5 h-5 flex-shrink-0" />
+                <div className="flex flex-col leading-tight">
+                  <span>Mineurs de Bitaxe</span>
+                </div>
+              </Link>
+              <Link href="/battle-pass" className="flex items-center gap-1.5 text-base font-semibold hover:text-[#FF8C00] transition">
+                <Trophy className="w-5 h-5 flex-shrink-0" />
+                <div className="flex flex-col leading-tight">
+                  <span>Passe de combat</span>
+                </div>
+              </Link>
+              <Link href="/video-guides" className="flex items-center gap-1.5 text-base font-semibold hover:text-[#FF8C00] transition">
+                <Video className="w-5 h-5 flex-shrink-0" />
+                <div className="flex flex-col leading-tight">
+                  <span>Guides vidéo</span>
+                </div>
+              </Link>
+              <Link href="/reviews" className="flex items-center gap-1.5 text-base font-semibold hover:text-[#FF8C00] transition whitespace-nowrap">
+                <Star className="w-5 h-5 flex-shrink-0" />
+                Avis
+              </Link>
+              <Link href="/pool" className="flex items-center gap-1.5 text-base font-semibold hover:text-[#FF8C00] transition whitespace-nowrap">
+                <Droplets className="w-5 h-5 flex-shrink-0" />
+                Piscine
+              </Link>
+              <Link href="/support" className="flex items-center gap-1.5 text-base font-semibold hover:text-[#FF8C00] transition whitespace-nowrap">
+                <Headphones className="w-5 h-5 flex-shrink-0" />
+                Assistance
+              </Link>
             </nav>
 
             <a href="tel:8775000282" className="flex items-center gap-2 text-white! bg-black/10 rounded-2xl p-2 overflow-hidden">
@@ -287,7 +314,7 @@ export default function Header() {
                 
                 {settingsDropdown && (
                   <div className="absolute right-0 mt-2 w-56 bg-white text-gray-800 rounded-lg shadow-xl py-4 z-50">
-                    
+                    {/* Language Section 
                     <div className="px-4 py-2 border-b">
                       <p className="text-sm font-semibold text-gray-600 mb-2">Language</p>
                       <button
@@ -322,7 +349,7 @@ export default function Header() {
                       </button>
                     </div>
 
-                    {/* Currency Section
+                    {/* Currency Section 
                     <div className="px-4 py-2">
                       <p className="text-sm font-semibold text-gray-600 mb-2">Currency</p>
                       <button
@@ -344,8 +371,8 @@ export default function Header() {
                     </div>
                   </div>
                 )}
-              </div> */}
-            </a>
+              </div>*/}
+            </div>
           </div>
         </div>
       </div>

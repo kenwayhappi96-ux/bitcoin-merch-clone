@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { Trophy, Star, Zap, Gift, Users, TrendingUp, Check, Store, Flag, Truck, DollarSign, ShoppingBasket, ShoppingCart } from 'lucide-react'
+import { Star, Gift, Check, Store, Flag, Truck, DollarSign, ShoppingBasket, ShoppingCart } from 'lucide-react'
 import Image from 'next/image'
 import { getProducts } from '../collections/lucky-miners/page'
 import { useEffect, useState } from 'react'

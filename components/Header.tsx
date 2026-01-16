@@ -33,11 +33,11 @@ export default function Header() {
   return (
     <>
       {/* Top Section - Sticky (reste visible) */}
-      <div className="sticky top-0 z-50 bg-[#0036cc] text-white shadow-lg border-b border-white/20">
-        <div className="w-full max-w-[90%] mx-auto px-5 py-4">
-          <div className="flex items-center justify-between gap-4">
+      <div className="sticky top-0 z-50 bg-[#0036cc] text-white">
+        <div className="w-full px-10 py-6">
+          <div className="flex items-center justify-between gap-8">
             <div className="flex items-center gap-3">
-              <button onClick={() => setMobileMenuOpen(!mobileMenuOpen)} className="md:hidden transition cursor-pointer">
+              <button onClick={() => setMobileMenuOpen(!mobileMenuOpen)} className="block lg:hidden transition cursor-pointer">
                 {mobileMenuOpen ? <X className="w-7 h-7" /> : <Menu className="w-7 h-7" />}
               </button>
               
@@ -63,7 +63,7 @@ export default function Header() {
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="Search..."
-                  className="w-full pl-5 pr-16 py-3 bg-white text-black rounded-md focus:ring-2 focus:ring-[#FF8C00]"
+                  className="w-full pl-5 pr-16 py-3 placeholder-black bg-white text-black rounded-md focus:ring-2 focus:ring-[#FF8C00]"
                 />
                 <button
                   type="submit"
@@ -79,9 +79,9 @@ export default function Header() {
                 <Search className="w-6 h-6 text-[#0073e6]" />
               </button>
 
-              <div className="relative hidden md:flex items-center gap-2">
+              <div className="relative hidden lg:flex items-center gap-2">
                 <div>
-                  <Link href="/login" className="text-sm opacity-80 hover:text-[#FF8C00]">
+                  <Link href="/login" className="text-sm text-white! hover:text-[#FF8C00]">
                     Login / Signup
                   </Link>
 
@@ -117,9 +117,9 @@ export default function Header() {
               </div>
 
 
-              <div className="md:hidden relative">
-                <button onClick={() => setAccountDropdown(!accountDropdown)} className="opacity-80">
-                  <User className="w-6 h-6 text-[#0073e6]" />
+              <div className="lg:hidden relative">
+                <button onClick={() => setAccountDropdown(!accountDropdown)} className="text-white">
+                  <User className="w-7 h-7 text-white" />
                 </button>
 
                 <div
@@ -145,14 +145,14 @@ export default function Header() {
 
               <button onClick={() => dispatch(openCart())} className="flex items-center gap-2">
                 <div className="relative">
-                  <ShoppingCart className="w-6 h-6 text-[#0073e6]" />
+                  <ShoppingCart className="w-7 h-7 text-white" />
                   {cartCount >= 0 && (
-                    <span className="absolute -top-2 -right-2 bg-[#FF8C00] text-white text-sm font-bold rounded-full w-6 h-6 flex items-center justify-center">
+                    <span className="absolute -top-2 -right-2 bg-[#FF8C00] text-white text-sm font-bold rounded-full w-5 h-5 flex items-center justify-center">
                       {cartCount}
                     </span>
                   )}
                 </div>
-                <span className="hidden lg:block font-semibold text-lg text-[#0073e6]">Cart</span>
+                <span className="hidden lg:block text-md text-white">Cart</span>
               </button>
             </div>
           </div>
@@ -182,10 +182,10 @@ export default function Header() {
         </div>
 
         {/* Mobile Menu - À l'intérieur de la section sticky */}
-          <div className={`md:hidden mobile-menu`} aria-hidden={!mobileMenuOpen}>
+          <div className={`lg:hidden mobile-menu`} aria-hidden={!mobileMenuOpen}>
             <div className="mobile-menu__inner">
               <div className="mobile-menu__panel">
-                <nav className="px-6 py-6 space-y-6 text-[#0036cc]">
+                <nav className="px-10  py-4 space-y-6 text-[#0036cc]">
                   {[
                     "Lucky Miners",
                     "Bitaxe Miners",
@@ -201,7 +201,7 @@ export default function Header() {
                   ))}
 
                   <div className="pt-6 border-t border-t-gray-300">
-                    <h3 className="font-bold text-black mb-3 text-center">NEED HELP?</h3>
+                    <h3 className="font-bold text-black mb-3 text-left">NEED HELP?</h3>
                     <div className='flex items-center'>
                       <svg focusable="false" className="icon icon--bi-phone " viewBox="0 0 24 24" role="presentation">
                         <g stroke-width="2" fill="none" fill-rule="evenodd" stroke-linecap="square">
@@ -225,7 +225,7 @@ export default function Header() {
                   </div>
 
                   <div className="pt-6 border-t border-t-gray-300 mb-4">
-                    <h3 className="font-bold text-black mb-3 text-center">FOLLOW US</h3>
+                    <h3 className="font-bold text-black mb-3 text-left">FOLLOW US</h3>
                     <div className="flex flex-col gap-4">
                       {
                         links.map((item)=>(
@@ -244,15 +244,15 @@ export default function Header() {
       </div>
 
       {/* Bottom Menu - Disparait au scroll */}
-      <div className="bg-[#0036cc] border-t border-white/10 hidden md:block">
-        <div className="w-full max-w-[90%] mx-auto px-5">
+      <div className="bg-[#0036cc] hidden lg:block border-t border-t-[#0073e6]">
+        <div className="w-full px-10">
           <div className="flex items-center justify-between">
             <nav className="flex items-center gap-10 text-[13px] md:text-[14px]">
               {
                 nav_link.map((item, index)=>(
                   <Link key={index} href={item.link} className="flex items-center gap-[0.4em] text-white!">
-                    <item.icon className="w-[14.4px] h-[14.4px] shrink-0 font-black" />
-                    <span className='text-white'>{item.name}</span>
+                    <item.icon className="w-[14.4px] h-[14.4px] shrink-0 font-black fill-white" />
+                    <span className='text-white text-[15px]'>{item.name}</span>
                   </Link>
                 ))
               }

@@ -7,6 +7,7 @@ import { X } from 'lucide-react'
 import { useAppDispatch } from '@/store/hooks'
 import { addToCart } from '@/store/cartSlice'
 import type { Product } from '@/types'
+import QuickView from './QuickView'
 
 interface ProductQuickViewProps {
   product: Product
@@ -18,7 +19,6 @@ export default function ProductQuickView({ product, isOpen, onClose }: ProductQu
   const dispatch = useAppDispatch()
   const router = useRouter()
   const [quantity, setQuantity] = useState(1)
-  const [selectedImage, setSelectedImage] = useState(product.image || '/ref/logo.png')
   const [secondaryImages, setSecondaryImages] = useState<string[]>([])
 
   useEffect(() => {
@@ -36,9 +36,7 @@ export default function ProductQuickView({ product, isOpen, onClose }: ProductQu
 
   if (!isOpen) return null
 
-  const mainImage = product.image || '/ref/logo.png'
   const discountedPrice = product.discountPrice || product.price
-  const savings = product.discountPrice ? (product.price - product.discountPrice).toFixed(2) : 0
 
   const handleAddToCart = () => {
     for (let i = 0; i < quantity; i++) {
@@ -53,9 +51,6 @@ export default function ProductQuickView({ product, isOpen, onClose }: ProductQu
     setQuantity(1)
     onClose()
   }
-
-  // Get secondary images from product.images array (is_primary = false)
-  const images = [product.image || '/ref/logo.png', ...secondaryImages]
 
   return (
     <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
@@ -75,49 +70,10 @@ export default function ProductQuickView({ product, isOpen, onClose }: ProductQu
         <div className="p-6">
           <div className="grid grid-cols-1 lg:grid-cols-[2fr_1fr] gap-8">
             {/* Left side: Images (thumbnails + main) */}
-            <div className="flex gap-4">
-              {/* Thumbnails */}
-              <div className="flex flex-col gap-2 max-h-96 overflow-y-auto">
-                <div className="flex flex-col gap-2">
-                  {images.map((img, idx) => (
-                    <div
-                      key={idx}
-                      onClick={() => setSelectedImage(img)}
-                      className={`cursor-pointer border-2 rounded-lg overflow-hidden transition w-20 h-20 flex-shrink-0 ${
-                        selectedImage === img ? 'border-[#FF8C00]' : 'border-gray-200'
-                      }`}
-                    >
-                      <div className="relative w-full h-full">
-                        <Image
-                          src={img}
-                          alt={`${product.name} ${idx + 1}`}
-                          fill
-                          className="object-cover"
-                        />
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Main image */}
-              <div className="flex-1 flex items-start justify-center">
-                <div className="relative w-full h-96 bg-gray-50 rounded-lg overflow-hidden">
-                  <Image
-                    src={selectedImage}
-                    alt={product.name}
-                    fill
-                    className="object-cover"
-                    sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                  />
-                  {product.discountPrice && (
-                    <div className="absolute top-4 left-4 bg-red-500 text-white px-4 py-2 rounded-full text-sm font-bold">
-                      Save €{savings}
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
+            <QuickView
+              product={product}
+              secondaryImages={secondaryImages}
+            />
 
             {/* Right side: Product info */}
             <div className="flex flex-col gap-6">

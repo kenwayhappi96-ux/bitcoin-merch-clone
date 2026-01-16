@@ -1,44 +1,63 @@
 'use client'
 
 import { reviews } from '@/lib/constants';
-import { ArrowRight, CheckCircle, CheckCircle2 } from 'lucide-react';
+import { ArrowRight, CheckCircle2 } from 'lucide-react';
 import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react'
 
+
+const CARD_WIDTH = 307 // largeur réelle d’une review
+
 const ReviewsCarousel = () => {
+  const containerRef = useRef<HTMLDivElement>(null)
   const scrollRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(true);
 
-  const updateScrollButtons = () => {
-    const el = scrollRef.current;
-    if (!el) return;
+  const [visibleCount, setVisibleCount] = useState(1)
 
-    setCanScrollLeft(el.scrollLeft > 0);
-    setCanScrollRight(el.scrollLeft + el.clientWidth < el.scrollWidth - 5);
-  };
+  /* 🔍 Calcul dynamique basé sur la largeur réelle */
+  const computeLayout = () => {
+    if (!containerRef.current || !scrollRef.current) return
 
-  const scroll = (direction:any) => {
-    const el = scrollRef.current;
-    if (!el) return;
+    const containerWidth = containerRef.current.clientWidth
+    const count = Math.max(1, Math.floor(containerWidth / CARD_WIDTH))
 
-    const scrollAmount = 360;
-    el.scrollBy({
-      left: direction === "right" ? scrollAmount*2.75 : -scrollAmount*2.75,
+    setVisibleCount(count)
+    updateButtons()
+  }
+
+  const updateButtons = () => {
+    const el = scrollRef.current
+    if (!el) return
+
+    setCanScrollLeft(el.scrollLeft > 0)
+    setCanScrollRight(el.scrollLeft + el.clientWidth < el.scrollWidth - 1)
+  }
+
+  const scroll = (dir: number) => {
+    scrollRef.current?.scrollBy({
+      left: dir * CARD_WIDTH * visibleCount,
       behavior: "smooth",
-    });
-  };
+    })
+  }
 
+  /* 👁️ Observe la taille du container */
   useEffect(() => {
-    updateScrollButtons();
-  }, []);
+    computeLayout()
+
+    const observer = new ResizeObserver(computeLayout)
+    if (containerRef.current) observer.observe(containerRef.current)
+
+    return () => observer.disconnect()
+  }, [])
 
   return (
-    <div className="w-full flex items-center gap-6 overflow-hidden">
+    <div ref={containerRef} className="relative w-full flex items-center gap-6 overflow-hidden">
       
       {/* LEFT ARROW */}
       <button
-        onClick={() => scroll("left")}
+        onClick={() => scroll(-1)}
         disabled={!canScrollLeft}
         className={`p-3 rounded-full transition
           ${canScrollLeft ? " hover:bg-blue-200" : "opacity-40 cursor-not-allowed"}
@@ -50,13 +69,13 @@ const ReviewsCarousel = () => {
       {/* CAROUSEL */}
       <div
         ref={scrollRef}
-        onScroll={updateScrollButtons}
-        className="relative h-full w-1210 overflow-hidden whitespace-nowrap will-change-transform [transition-timing-function: ease;]"
+        onScroll={updateButtons}
+        className="relative h-full w-full overflow-hidden whitespace-nowrap will-change-transform [transition-timing-function: ease;]"
       >
         {reviews.map((review, idx) => (
           <div
             key={idx}
-            className="relative bg-gray-100 max-w-76.75 inline-block h-27.5 mr-3.75 mb-2.5 pb-5 whitespace-normal [vertical-align: top;]"
+            className="relative bg-gray-100 w-76.75  shrink-0 inline-block h-27.5 mr-3.75 mb-2.5 pb-5 whitespace-normal [vertical-align: top;]"
           >
             {/* Stars + Verified */}
             <div className="flex items-center gap-4">
@@ -122,7 +141,7 @@ const ReviewsCarousel = () => {
 
       {/* RIGHT ARROW */}
       <button
-        onClick={() => scroll("right")}
+        onClick={() => scroll(1)}
         disabled={!canScrollRight}
         className={`p-3 rounded-full transition
           ${canScrollRight ? " hover:bg-blue-200" : "opacity-40 cursor-not-allowed"}

@@ -4,7 +4,7 @@ import { Pickaxe } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 
-async function getProducts() {
+export async function getProducts() {
   try {
     const res = await fetch('http://localhost:3000/api/products', {
       cache: 'no-store'

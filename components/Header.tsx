@@ -247,29 +247,25 @@ export default function Header() {
               <Link href="/collections/lucky-miners" className="flex items-center gap-1.5 text-base font-semibold hover:text-[#FF8C00] transition">
                 <Pickaxe className="w-5 h-5 flex-shrink-0" />
                 <div className="flex flex-col leading-tight">
-                  <span>Mineurs</span>
-                  <span>chanceux</span>
+                  <span>Mineurs chanceux</span>
                 </div>
               </Link>
               <Link href="/collections/bitaxe-miners" className="flex items-center gap-1.5 text-base font-semibold hover:text-[#FF8C00] transition">
                 <Box className="w-5 h-5 flex-shrink-0" />
                 <div className="flex flex-col leading-tight">
-                  <span>Mineurs de</span>
-                  <span>Bitaxe</span>
+                  <span>Mineurs de Bitaxe</span>
                 </div>
               </Link>
               <Link href="/battle-pass" className="flex items-center gap-1.5 text-base font-semibold hover:text-[#FF8C00] transition">
                 <Trophy className="w-5 h-5 flex-shrink-0" />
                 <div className="flex flex-col leading-tight">
-                  <span>Passe de</span>
-                  <span>combat</span>
+                  <span>Passe de combat</span>
                 </div>
               </Link>
               <Link href="/video-guides" className="flex items-center gap-1.5 text-base font-semibold hover:text-[#FF8C00] transition">
                 <Video className="w-5 h-5 flex-shrink-0" />
                 <div className="flex flex-col leading-tight">
-                  <span>Guides</span>
-                  <span>vidéo</span>
+                  <span>Guides vidéo</span>
                 </div>
               </Link>
               <Link href="/reviews" className="flex items-center gap-1.5 text-base font-semibold hover:text-[#FF8C00] transition whitespace-nowrap">
@@ -299,7 +295,7 @@ export default function Header() {
               </a>
 
               {/* Currency & Language Selector - Combined */}
-              <div className="relative hidden sm:block">
+              {/* <div className="relative hidden sm:block">
                 <button 
                   onClick={() => setSettingsDropdown(!settingsDropdown)}
                   className="flex items-center gap-2 text-base font-semibold hover:text-[#FF8C00] transition px-3 py-2 rounded hover:bg-white/10"
@@ -319,7 +315,7 @@ export default function Header() {
                 
                 {settingsDropdown && (
                   <div className="absolute right-0 mt-2 w-56 bg-white text-gray-800 rounded-lg shadow-xl py-4 z-50">
-                    {/* Language Section */}
+                    {/* Language Section 
                     <div className="px-4 py-2 border-b">
                       <p className="text-sm font-semibold text-gray-600 mb-2">Language</p>
                       <button
@@ -354,7 +350,7 @@ export default function Header() {
                       </button>
                     </div>
 
-                    {/* Currency Section */}
+                    {/* Currency Section 
                     <div className="px-4 py-2">
                       <p className="text-sm font-semibold text-gray-600 mb-2">Currency</p>
                       <button
@@ -376,7 +372,7 @@ export default function Header() {
                     </div>
                   </div>
                 )}
-              </div>
+              </div>*/}
             </div>
           </div>
         </div>

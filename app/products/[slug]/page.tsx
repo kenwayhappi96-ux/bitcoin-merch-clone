@@ -37,8 +37,9 @@ async function getProduct(slug: string): Promise<Product | null> {
   }
 }
 
-export default async function ProductDetailPage({ params }: { params: { slug: string } }) {
-  const product = await getProduct(params.slug)
+export default async function ProductDetailPage({ params }: { params: Promise<{ slug: string }> }) {
+  const {slug} = await params
+  const product = await getProduct(slug)
 
   if (!product) {
     notFound()
@@ -62,15 +63,15 @@ export default async function ProductDetailPage({ params }: { params: { slug: st
           {/* Image */}
           <div>
             <div className="relative aspect-square overflow-hidden rounded-lg mb-4">
-              <Image
+              {/* <Image
                 src={product.image}
                 alt={product.name}
                 fill
-                className="object-cover"
+                className="object-cover w-full h-full"
                 onError={(e) => {
                   e.currentTarget.src = '/ref/logo.png'
                 }}
-              />
+              /> */}
               {discountPercent > 0 && (
                 <div className="absolute top-4 left-4 bg-red-500 text-white px-3 py-1 rounded-full text-sm font-bold">
                   -{discountPercent}%

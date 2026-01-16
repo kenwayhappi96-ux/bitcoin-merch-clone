@@ -64,7 +64,7 @@ export default async function Home() {
 
               <div className="flex items-center gap-3">
                 <Image 
-                  src="/trustpilot-logo.png" 
+                  src="/ref/trustpilot-logo.png" 
                   alt="Trustpilot" 
                   width={120} 
                   height={40} 

@@ -46,11 +46,11 @@ export default async function Home() {
       <HeroCarousel />
 
       {/* Trustpilot Reviews - Full width */}
-      <section className="bg-gray-100 py-8 px-4 w-full border-b border-b-black border-gray-200 hidden lg:flex">
+      <section className="bg-gray-100 py-8 px-4 w-full border-b border-b-black border-gray-200 flex">
         <div className="max-w-7xl mx-auto">
           <div className="h-full max-w-full min-h-[150px] min-w-[300px] justify-center will-change-transform relative mx-auto my-0 flex-row items-center flex">
             {/* Gauche : Note globale + Trustpilot */}
-            <div className="wrapper_left w-[300px]">
+            <div className="w-36.5 md:w-80">
               <Link href='/' className="relative text-black! text-center">
                 <span className="text-[24px] block mb-3 font-medium">Excellent</span>
                 <span className="mb-3 mx-auto block">
@@ -102,7 +102,7 @@ export default async function Home() {
             </div>
 
             {/* Centre : Avis défilants (simulation carousel) */}
-            <div className='wrapper-right w-700 flex flex-col gap-2 px-10 py-0 overflow-hidden'>
+            <div className='wrapper-right w-700 hidden md:flex flex-col gap-2 px-10 py-0 overflow-hidden'>
               <ReviewsCarousel/>
               <p className="text-left! ml-16 text-xs text-gray-500 mt-6 font-medium">
                 Showing our 4 & 5 star reviews

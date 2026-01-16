@@ -1,9 +1,7 @@
 'use client'
 
-import { useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
-import ProductQuickView from './ProductQuickView'
 // icons removed per design: buttons now text-only
 import { useAppDispatch } from '@/store/hooks'
 import { addToCart } from '@/store/cartSlice'
@@ -15,7 +13,6 @@ interface ProductCardProps {
 
 export default function ProductCard({ product }: ProductCardProps) {
   const dispatch = useAppDispatch()
-  const [isQuickViewOpen, setIsQuickViewOpen] = useState(false)
 
   const handleAddToCart = () => {
     dispatch(addToCart({
@@ -36,20 +33,9 @@ export default function ProductCard({ product }: ProductCardProps) {
         <Image
           src={mainImage}
           alt={product.name}
-          width={400}
-          height={500}
+          fill
           className="h-full w-full object-cover"
         />
-        {/* {product.discountPrice && (
-          <div className="absolute top-3 left-3 bg-red-500 text-white px-3 py-1 rounded-full text-sm font-bold">
-            -{Math.round(((product.price - product.discountPrice) / product.price) * 100)}%
-          </div>
-        )}
-        {!product.inStock && (
-          <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
-            <span className="text-white text-xl font-bold">Out of Stock</span>
-          </div>
-        )} */}
       </Link>
       <Link href={`/products/${product.slug}`} className="block mb-0.5 text-black! review">
         <h3 className="lg:text-[20px] sm:text-[18px] text-base line-clamp-1 whitespace-normal font-[400]!">
@@ -73,12 +59,6 @@ export default function ProductCard({ product }: ProductCardProps) {
       >
         ADD TO CART
       </button>
-
-      <ProductQuickView
-        product={product}
-        isOpen={isQuickViewOpen}
-        onClose={() => setIsQuickViewOpen(false)}
-      />
     </div>
   )
 }

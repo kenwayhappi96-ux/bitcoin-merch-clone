@@ -1,15 +1,18 @@
 'use client'
 
 import Link from 'next/link'
-import { Trophy, Star, Zap, Gift, Users, TrendingUp, Check } from 'lucide-react'
+import { Trophy, Star, Zap, Gift, Users, TrendingUp, Check, Store, Flag, Truck, DollarSign, ShoppingBasket, ShoppingCart } from 'lucide-react'
 import Image from 'next/image'
 import { getProducts } from '../collections/lucky-miners/page'
 import { useEffect, useState } from 'react'
 import QuickView from '@/components/QuickView'
 import ReviewsCarousel from '@/components/Reviewscarousel'
+import ProductCarousel1 from '@/components/ProductCarousel1'
+import ProductCarousel2 from '@/components/ProductCarousel2'
 
 export default function BattlePassPage() {
   const [product, setProduct] = useState<any | null>(null)
+  const [products, setProducts] = useState<any[]>([])
   const [quantity, setQuantity] = useState(1)
   const [secondaryImages, setSecondaryImages] = useState<string[]>([])
 
@@ -22,6 +25,7 @@ export default function BattlePassPage() {
           data.products.find((p: any) => p.isFeatured === 1) || null
 
         setProduct(featured)
+        setProducts(data.products)
       }
     }
 
@@ -51,7 +55,7 @@ export default function BattlePassPage() {
 
   return (
     <main className="min-h-screen">
-      <section className="container py-16 px-4 max-w-6xl mx-auto">
+      <section className="container pt-16 pb-8 px-4 max-w-6xl mx-auto">
         <div className="flex flex-col lg:flex-row gap-4 items-center w-full">
           {/* Left side: Images (thumbnails + main) */}
           <div className='lg:w-[50%] w-full'>
@@ -115,7 +119,7 @@ export default function BattlePassPage() {
             </div>
 
             {/*Trupilot */}
-            <div className="h-full w-full justify-center flex-row items-center flex">
+            <div className="h-full w-full justify-center flex-row flex items-center">
               {/* Gauche : Note globale + Trustpilot */}
               <div className="w-46.5">
                 <Link href='/' className="relative text-black! text-center">
@@ -169,7 +173,7 @@ export default function BattlePassPage() {
               </div>
 
               {/* Centre : Avis défilants (simulation carousel) */}
-              <div className='w-full flex flex-col gap-2 overflow-hidden'>
+              <div className='w-full flex-col gap-2 overflow-hidden hidden md:flex'>
                 <ReviewsCarousel/>
                 <p className="text-left! ml-16 text-xs text-gray-500 mt-6 font-medium">
                   Showing our 4 & 5 star reviews
@@ -181,166 +185,188 @@ export default function BattlePassPage() {
         </div>
       </section>
 
-      <section>
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            <div className="bg-white p-8 rounded-lg shadow-md hover:shadow-xl transition">
-              <div className="flex justify-center mb-4">
-                <div className="bg-blue-100 p-4 rounded-full">
-                  <Star className="w-10 h-10 text-[#3b82f6]" />
-                </div>
-              </div>
-              <h3 className="text-2xl font-bold text-gray-800 mb-3 text-center">Exclusive Discounts</h3>
-              <p className="text-gray-600 text-center">
-                Get 15% off all miners, 20% off accessories, and early access to new product launches.
-              </p>
+      <section className="w-full bg-[#0038d1]">
+        <div className="max-w-7xl mx-auto px-4 lg:px-14 py-20">
+          <div className="flex flex-col md:flex-row lg:items-center justify-center gap-8 md:gap-16 text-white">
+
+            {/* Item 1 */}
+            <div className="flex items-center gap-4">
+              <Store className="w-10 h-10 lg:w-14 lg:h-14 text-[#ffb400]" />
+              <span className="text-xl! md:text-base font-medium">
+                Pick Up In-Store In LA
+              </span>
             </div>
 
-            <div className="bg-white p-8 rounded-lg shadow-md hover:shadow-xl transition">
-              <div className="flex justify-center mb-4">
-                <div className="bg-orange-100 p-4 rounded-full">
-                  <Zap className="w-10 h-10 text-[#FF8C00]" />
-                </div>
-              </div>
-              <h3 className="text-2xl font-bold text-gray-800 mb-3 text-center">Priority Support</h3>
-              <p className="text-gray-600 text-center">
-                24/7 dedicated support line, faster response times, and direct access to our technical team.
-              </p>
+            {/* Item 2 */}
+            <div className="flex items-center gap-4">
+              <Flag className="w-10 h-10 lg:w-14 lg:h-14 text-[#ffb400]" />
+              <span className="text-xl! md:text-base font-medium">
+                Ship From USA Warehouse
+              </span>
             </div>
 
-            <div className="bg-white p-8 rounded-lg shadow-md hover:shadow-xl transition">
-              <div className="flex justify-center mb-4">
-                <div className="bg-green-100 p-4 rounded-full">
-                  <Gift className="w-10 h-10 text-green-600" />
-                </div>
-              </div>
-              <h3 className="text-2xl font-bold text-gray-800 mb-3 text-center">Monthly Rewards</h3>
-              <p className="text-gray-600 text-center">
-                Earn points with every purchase and unlock free accessories, gift cards, and special perks.
-              </p>
+            {/* Item 3 */}
+            <div className="flex items-center gap-4">
+              <Truck className="w-10 h-10 lg:w-14 lg:h-14 text-[#ffb400]" />
+              <span className="text-xl! md:text-base font-medium">
+                Germany → All Of Europe
+              </span>
             </div>
 
-            <div className="bg-white p-8 rounded-lg shadow-md hover:shadow-xl transition">
-              <div className="flex justify-center mb-4">
-                <div className="bg-purple-100 p-4 rounded-full">
-                  <Users className="w-10 h-10 text-purple-600" />
-                </div>
-              </div>
-              <h3 className="text-2xl font-bold text-gray-800 mb-3 text-center">Community Access</h3>
-              <p className="text-gray-600 text-center">
-                Join our private Discord server with expert miners, exclusive AMAs, and live mining tutorials.
-              </p>
-            </div>
-
-            <div className="bg-white p-8 rounded-lg shadow-md hover:shadow-xl transition">
-              <div className="flex justify-center mb-4">
-                <div className="bg-red-100 p-4 rounded-full">
-                  <TrendingUp className="w-10 h-10 text-red-600" />
-                </div>
-              </div>
-              <h3 className="text-2xl font-bold text-gray-800 mb-3 text-center">Pool Benefits</h3>
-              <p className="text-gray-600 text-center">
-                0% pool fees for Battle Pass members on our official mining pool with enhanced payouts.
-              </p>
-            </div>
-
-            <div className="bg-white p-8 rounded-lg shadow-md hover:shadow-xl transition">
-              <div className="flex justify-center mb-4">
-                <div className="bg-yellow-100 p-4 rounded-full">
-                  <Trophy className="w-10 h-10 text-yellow-600" />
-                </div>
-              </div>
-              <h3 className="text-2xl font-bold text-gray-800 mb-3 text-center">Exclusive Merchandise</h3>
-              <p className="text-gray-600 text-center">
-                Limited edition t-shirts, stickers, and mining gear only available to Battle Pass members.
-              </p>
-            </div>
           </div>
+        </div>
       </section>
 
-      <section className="py-16 px-4 bg-white">
-        <div className="max-w-4xl mx-auto">
-          <h2 className="text-4xl font-bold text-center text-gray-800 mb-12">Pricing Plans</h2>
+      <section className="max-w-6xl mx-auto px-4 pt-16 pb-8 container">
+        {/* Title */}
+        <div className="border-2 border-[#fd9619] py-6 mb-12 text-center shadow-xl">
+          <h2 className="text-3xl md:text-5xl font-bold flex items-center justify-center gap-4 text-black">
+            <Star className="text-[#fd9619] w-10 h-10 md:w-13 md:h-13 fill-[#fd9619]" />
+            Legend Battle Pass Membership Perks
+          </h2>
+        </div>
+
+        {/* Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           
-          <div className="grid md:grid-cols-2 gap-8">
-            <div className="border-2 border-gray-200 rounded-xl p-8 hover:border-[#3b82f6] transition">
-              <h3 className="text-2xl font-bold text-gray-800 mb-2">Monthly Pass</h3>
-              <div className="text-5xl font-bold text-gray-800 mb-6">
-                $29<span className="text-2xl text-gray-600">.99/mo</span>
-              </div>
-              <ul className="space-y-3 mb-8">
-                <li className="flex items-start gap-2">
-                  <Star className="w-5 h-5 text-[#FF8C00] flex-shrink-0 mt-1" />
-                  <span className="text-gray-700">All Battle Pass benefits</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <Star className="w-5 h-5 text-[#FF8C00] flex-shrink-0 mt-1" />
-                  <span className="text-gray-700">15% discount on all products</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <Star className="w-5 h-5 text-[#FF8C00] flex-shrink-0 mt-1" />
-                  <span className="text-gray-700">Monthly reward points</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <Star className="w-5 h-5 text-[#FF8C00] flex-shrink-0 mt-1" />
-                  <span className="text-gray-700">Cancel anytime</span>
-                </li>
-              </ul>
-              <button className="w-full bg-[#3b82f6] text-white py-4 rounded-lg font-bold text-lg hover:bg-[#2563eb] transition">
-                Subscribe Monthly
-              </button>
-            </div>
-
-            <div className="border-4 border-[#FF8C00] rounded-xl p-8 relative bg-gradient-to-br from-orange-50 to-white">
-              <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-[#FF8C00] text-white px-4 py-1 rounded-full font-bold">
-                BEST VALUE
-              </div>
-              <h3 className="text-2xl font-bold text-gray-800 mb-2">Annual Pass</h3>
-              <div className="text-5xl font-bold text-gray-800 mb-2">
-                $299<span className="text-2xl text-gray-600">.99/yr</span>
-              </div>
-              <p className="text-green-600 font-semibold mb-6">Save $60 per year!</p>
-              <ul className="space-y-3 mb-8">
-                <li className="flex items-start gap-2">
-                  <Star className="w-5 h-5 text-[#FF8C00] flex-shrink-0 mt-1" />
-                  <span className="text-gray-700">All Monthly Pass benefits</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <Star className="w-5 h-5 text-[#FF8C00] flex-shrink-0 mt-1" />
-                  <span className="text-gray-700">20% discount on all products</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <Star className="w-5 h-5 text-[#FF8C00] flex-shrink-0 mt-1" />
-                  <span className="text-gray-700">2x reward points multiplier</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <Star className="w-5 h-5 text-[#FF8C00] flex-shrink-0 mt-1" />
-                  <span className="text-gray-700">Free exclusive merchandise pack</span>
-                </li>
-              </ul>
-              <button className="w-full bg-[#FF8C00] text-white py-4 rounded-lg font-bold text-lg hover:bg-[#ff9d1f] transition shadow-lg">
-                Subscribe Annually
-              </button>
-            </div>
+          {/* Card 1 */}
+          <div className="border-2 border-blue-600 rounded-xl p-8 text-center">
+            <DollarSign className="w-15 h-15 text-[#fd9619] mx-auto mb-2" />
+            <h3 className="font-bold text-lg mb-4 text-black">15% Off Most Of Store</h3>
+            <p className="text-lg! text-black leading-relaxed">
+              15% Off Bitaxe Miners & Bitaxe Spare Parts / Upgrades – 
+              All Bitcoin Merch Products under "Exclusive Lottery Miners", 
+              In-Store Items & "Best Selling Merch" like tees, pillows & more.
+            </p>
           </div>
+
+          {/* Card 2 */}
+          <div className="border-2 border-blue-600 rounded-xl p-8 text-center">
+            <Gift className="w-15 h-15 text-[#fd9619] mx-auto mb-2" />
+            <h3 className="font-bold text-lg mb-4 text-black">Free Miner Every Month</h3>
+            <p className="text-lg! text-black leading-relaxed">
+              When you make your first order as a Bitcoin Battle Pass member,
+              we include a free random gift (Bitaxe, Gold Nugget, etc.).
+              Free miner delivered every month.
+            </p>
+          </div>
+
+          {/* Card 3 */}
+          <div className="border-2 border-blue-600 rounded-xl p-8 text-center">
+            <ShoppingBasket className="w-15 h-15 text-[#fd9619] mx-auto mb-2" />
+            <h3 className="font-bold text-lg mb-4 text-black">Stackable Discount</h3>
+            <p className="text-lg! text-black leading-relaxed">
+              Unlimited stackable discount. 20% off select products when you buy
+              2 or more. Stackable discounts apply storewide including holidays.
+            </p>
+          </div>
+
         </div>
       </section>
 
-      <section className="py-16 px-4 bg-gradient-to-r from-[#3b82f6] to-[#2563eb] text-white">
-        <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-4xl font-bold mb-6">Ready to Level Up Your Mining?</h2>
-          <p className="text-xl mb-8 text-blue-100">
-            Join thousands of miners already enjoying Battle Pass benefits
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <button className="bg-[#FF8C00] text-white px-8 py-4 rounded-lg text-lg font-bold hover:bg-[#ff9d1f] transition">
-              Start Your Free Trial
+      <section className="max-w-6xl mx-auto px-4 pt-16 pb-8 container">
+        {/* Title */}
+        <div className="border-2 border-[#fd9619] py-2 mb-12 text-center bg-[#0038d1]">
+          <h2 className="text-2xl font-bold flex items-center justify-center gap-2 text-white">
+            Add Your Legend Battle Pass To Cart
+            <ShoppingCart className="text-white w-5 h-5 fill-white" />
+          </h2>
+        </div>
+        <div className='relative w-full h-96'>
+          <Image
+            src={'/ref/c2.JPG'}
+            alt='add'
+            fill
+            className='object-cover'
+          />
+        </div>
+      </section>
+
+      <section className="max-w-6xl mx-auto px-4 pt-16 pb-8 container">
+        {/* Title */}
+        <div className="border-3 border-[#0038d1] py-2 mb-12 text-center bg-yellow-600">
+          <h2 className="text-3xl font-bold flex items-center justify-center gap-2 text-black">
+            Bitcoin & Lottery Miners Eligible For 15% Off With Battle Pass
+          </h2>
+        </div>
+        <ProductCarousel1 products={products}/>
+      </section>
+
+      <section className="max-w-6xl mx-auto px-4 pt-16 pb-8 container">
+        {/* Title */}
+        <div className="border-2 border-[#fd9619] py-2 mb-24 text-center bg-[#0038d1]">
+          <h2 className="text-3xl flex items-center justify-center gap-2 text-white">
+            Join The Legendary Battle Pass Club
+            <ShoppingCart className="text-white w-5 h-5 fill-white" />
+          </h2>
+        </div>
+        <h2 className='text-3xl text-center text-black font-semibold mb-14'>Check Out What Our Community Is Saying About Us On Trust Pilot :)</h2>
+        <div className='relative w-full h-96'>
+          <Image
+            src={'/ref/c1.JPG'}
+            alt='add'
+            fill
+            className='object-cover'
+          />
+        </div>
+        <div className="px-4 py-12">
+          <h2 className="text-2xl font-bold text-center mb-8 text-black">
+            Customer Reviews
+          </h2>
+
+          <div className="flex flex-col md:flex-row items-center justify-center gap-6">
+            
+            {/* Left */}
+            <div className="text-center md:text-left">
+              <div className="flex justify-center md:justify-start gap-1 mb-2">
+                {[...Array(5)].map((_, i) => (
+                  <Star key={i} className="w-5 h-5 text-yellow-400 fill-yellow-400" />
+                ))}
+              </div>
+              <p className="text-gray-700">Be the first to write a review</p>
+            </div>
+
+            {/* Divider */}
+            <div className="hidden md:block w-px h-12 bg-gray-300" />
+
+            {/* Button */}
+            <button className="bg-orange-500 hover:bg-orange-600 transition text-white font-bold px-8 py-3 rounded">
+              WRITE A REVIEW
             </button>
-            <Link href="/support" className="bg-white text-[#3b82f6] px-8 py-4 rounded-lg text-lg font-bold hover:bg-gray-100 transition">
-              Contact Sales
-            </Link>
           </div>
         </div>
       </section>
+
+      {/* Bannière Pool - Full width avec image de fond */}
+      <section 
+        className="relative w-full py-4 px-6 bg-cover bg-center bg-no-repeat"
+        style={{ backgroundImage: "url('/ref/dra.jpg')" }}
+      >
+        {/* Overlay */}
+        <div className="absolute inset-0 bg-gradient-to-r from-white/90 via-white/80 to-white/90" />
+        
+        <div className="relative max-w-7xl mx-auto flex flex-col items-center gap-4 text-center md:text-left z-10">
+          <h2 className="uppercase text-3xl md:text-4xl font-[670] text-[#f18a1d] mb-8">
+            Switch to BITCOIN Merch LUCKY POOL
+          </h2>
+          <p className="text-xl md:text-2xl font-bold">
+            USA Hashrate : <span className="text-[#00b67a]">1,57 PH/s</span>
+          </p>
+          <Link
+            href="/pool"
+            className="bg-white review text-[#f18a1d]! px-10 py-2 rounded-full font-bold text-xl shadow-2xl transition-all duration-300 whitespace-nowrap"
+          >
+            SWITCH NOW!
+          </Link>
+        </div>
+      </section>
+
+      {/**Carousel best products price */}
+      <section className='max-w-6xl mx-auto px-4 pt-16 pb-8 container'>
+        <p className='text-left! font-semibold text-xl text-black!'>You may also like</p>
+        <ProductCarousel2 products={products}/>
+      </section>
+
     </main>
   )
 }

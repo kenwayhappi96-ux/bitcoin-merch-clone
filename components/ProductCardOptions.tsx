@@ -12,10 +12,11 @@ import { Star } from 'lucide-react'
 
 interface ProductCardProps {
   product: Product,
+  withBtn?:boolean,
   isRow?:boolean
 }
 
-export default function ProductCardOptions({ product, isRow }: ProductCardProps) {
+export default function ProductCardOptions({ product, isRow, withBtn }: ProductCardProps) {
   const dispatch = useAppDispatch()
   const [isQuickViewOpen, setIsQuickViewOpen] = useState(false)
 
@@ -71,6 +72,7 @@ export default function ProductCardOptions({ product, isRow }: ProductCardProps)
           <span className="lg:text-[20px] sm:text-[18px] text-base text-black">${product.price.toFixed(2)}</span>
         )}
       </div> 
+      {!withBtn&&
       <div className='flex flex-col gap-2 w-full'>
         <button
             onClick={handleAddToCart}
@@ -87,6 +89,7 @@ export default function ProductCardOptions({ product, isRow }: ProductCardProps)
             Quick view
         </button>
       </div>
+      }
 
       <ProductQuickView
         product={product}

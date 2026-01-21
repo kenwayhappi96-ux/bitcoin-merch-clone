@@ -1,75 +1,46 @@
-'use client'
+// app/products/[slug]/page.tsx
+// Toujours Server Component (pas de 'use client' ici)
 
 import { notFound } from 'next/navigation'
 import Image from 'next/image'
 import Link from 'next/link'
-import { Star, ShoppingCart, ShoppingBasket, Gift, DollarSign, Truck, Flag, Store, Check, Trophy } from 'lucide-react'
-import ProductCarousel2 from '@/components/ProductCarousel2'
-import ProductCarousel1 from '@/components/ProductCarousel1'
-import ReviewsCarousel from '@/components/Reviewscarousel'
-import { use, useEffect, useState } from 'react'
+import {
+  Store, Flag, Truck,
+  Check, Star, Zap, Cpu, ShieldCheck,
+  DollarSign, Gift, ShoppingBasket, ShoppingCart,
+  ChevronDown // pour accordion
+} from 'lucide-react'
+
 import QuickView from '@/components/QuickView'
+import ReviewsCarousel from '@/components/Reviewscarousel' // à adapter si tu veux Judge.me style
+import ProductCarousel2 from '@/components/ProductCarousel2'
 import { getProducts } from '@/app/collections/lucky-miners/page'
 
-interface Product {
-  id: number
-  name: string
-  slug: string
-  description: string
-  price: number
-  discountPrice: number | null
-  image: string
-  category: string
-  inStock: boolean
-  isFeatured: boolean
-}
-
-async function getProduct(slug: string): Promise<Product | null> {
+async function getProduct(slug: string) {
   try {
-    const baseUrl =
-      process.env.NEXT_PUBLIC_BASE_URL ?? "http://localhost:3000"
-
-    const res = await fetch(`${baseUrl}/api/products`, {
-      cache: "no-store",
-    })
-
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? "http://localhost:3000"
+    const res = await fetch(`${baseUrl}/api/products`, { cache: "no-store" })
     if (!res.ok) return null
-
     const data = await res.json()
     if (!data?.products) return null
-
     return data.products.find((p: any) => p.slug === slug) ?? null
-  } catch (error) {
-    console.error("Error fetching product:", error)
+  } catch (err) {
+    console.error(err)
     return null
   }
 }
 
-export async function getProductImages(productId: number) {
+async function getProductImages(productId: number) {
   try {
-    const baseUrl =
-      process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"
-
-    const res = await fetch(
-      `${baseUrl}/api/products/${productId}/images`,
-      {
-        cache: "no-store", // ou 'force-cache' si tu veux
-      }
-    )
-
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"
+    const res = await fetch(`${baseUrl}/api/products/${productId}/images`, { cache: "no-store" })
     if (!res.ok) return []
-
     const data = await res.json()
-
-    return (
-      data.images
-        ?.filter((img: any) => img.is_primary === 0)
-        .map((img: any) => img.image_url) || []
-    )
-  } catch (error) {
-    console.error("Error fetching product images:", error)
-    return []
+    return data.images?.filter((img: any) => img.is_primary === 0).map((img: any) => img.image_url) || []
+  } catch (err) {
+    console.error(err)
   }
+    return []
 }
 
 

@@ -1,5 +1,6 @@
 'use client'
 
+import { useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import ProductQuickView from './ProductQuickView'
@@ -13,6 +14,7 @@ interface ProductCardProps {
 
 export default function ProductCard({ product }: ProductCardProps) {
   const dispatch = useAppDispatch()
+  const [isQuickViewOpen, setIsQuickViewOpen] = useState(false)
 
   const handleAddToCart = () => {
     dispatch(

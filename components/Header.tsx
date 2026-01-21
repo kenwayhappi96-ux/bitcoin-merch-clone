@@ -6,7 +6,6 @@ import Image from 'next/image'
 import { useState } from 'react'
 import { useAppDispatch, useAppSelector } from '@/store/hooks'
 import { openCart } from '@/store/cartSlice'
-import { links, nav_link } from '@/lib/constants'
 
 export default function Header() {
   const dispatch = useAppDispatch()
@@ -37,7 +36,7 @@ export default function Header() {
         <div className="w-full max-w-[90%] mx-auto px-5 py-4">
           <div className="flex items-center justify-between gap-4">
             <div className="flex items-center gap-3">
-              <button onClick={() => setMobileMenuOpen(!mobileMenuOpen)} className="block lg:hidden transition cursor-pointer">
+              <button onClick={() => setMobileMenuOpen(!mobileMenuOpen)} className="md:hidden hover:text-[#FF8C00] transition">
                 {mobileMenuOpen ? <X className="w-7 h-7" /> : <Menu className="w-7 h-7" />}
               </button>
               
@@ -75,106 +74,101 @@ export default function Header() {
             </form>
 
             <div className="flex items-center gap-4">
-              <button onClick={() => setShowMobileSearch(!showMobileSearch)} className="md:hidden cursor-pointer">
-                <Search className="w-6 h-6 text-[#0073e6]" />
+              <button onClick={() => setShowMobileSearch(!showMobileSearch)} className="md:hidden hover:text-[#FF8C00] transition">
+                <Search className="w-6 h-6" />
               </button>
 
-              <div className="relative hidden lg:flex items-center gap-2">
-                <div>
-                  <Link href="/login" className="text-sm text-white! hover:text-[#FF8C00]">
-                    Login / Signup
-                  </Link>
-
-                  <button
-                    onClick={() => setAccountDropdown(!accountDropdown)}
-                    className="flex items-center gap-1 font-semibold"
-                  >
-                    My account
-                    <ChevronDown className="w-4 h-4" />
-                  </button>
-                </div>
-
-                {/* Dropdown */}
-                <div
-                  className={`absolute right-0 top-full mt-3 w-72 bg-white text-black rounded-lg shadow-xl transition-all duration-300 origin-top
-                    ${accountDropdown ? "opacity-100 scale-100" : "opacity-0 scale-95 pointer-events-none"}
-                  `}
-                >
-                  <div className="p-4 space-y-3">
-                    <div className="w-full! bg-[#FF8C00] text-white! uppercase py-2 rounded text-center">
-                      <Link href={'/login'} className="text-white!">
-                        LOGIN
-                      </Link>
-                    </div>
-                    <p className="text-sm">
-                      New customer? <span className="text-[#FF8C00]">Create your account</span>
-                    </p>
-                    <p className="text-sm text-gray-500">
-                      Lost password? <span className="text-[#FF8C00]">Recover password</span>
-                    </p>
+              <div className="relative hidden md:block">
+                <div className="flex items-center gap-2">
+                  <User className="w-6 h-6" />
+                  <div className="flex flex-col items-start leading-tight">
+                    <Link href="/login" target="_blank" className="text-gray-200 text-sm hover:text-[#FF8C00] transition">
+                      Login / Signup
+                    </Link>
+                    <button onClick={() => setAccountDropdown(!accountDropdown)} className="font-semibold text-base hover:text-[#FF8C00] transition flex items-center gap-1">
+                      My account
+                      <ChevronDown className="w-4 h-4" />
+                    </button>
                   </div>
                 </div>
+
+                {accountDropdown && (
+                  <div className="absolute right-0 mt-2 w-64 bg-white text-gray-800 rounded-lg shadow-xl py-4 px-6 z-50">
+                    <div className="space-y-3">
+                      <div>
+                        <p className="font-semibold mb-2">Login / Signup</p>
+                        <p className="text-sm text-gray-600 mb-3">My account</p>
+                        <Link href="/login" target="_blank" className="block w-full bg-[#3b82f6] text-white py-2 rounded-lg font-semibold hover:bg-[#2563eb] transition text-center">
+                          Login
+                        </Link>
+                      </div>
+                      <div className="border-t pt-3">
+                        <Link href="/login" target="_blank" className="text-sm text-[#3b82f6] hover:underline block mb-2">
+                          New customer? Create your account
+                        </Link>
+                        <Link href="/login" target="_blank" className="text-sm text-gray-600 hover:underline block">
+                          Lost password? Recover password
+                        </Link>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
 
-
-              <div className="lg:hidden relative">
-                <button onClick={() => setAccountDropdown(!accountDropdown)} className="text-white">
-                  <User className="w-7 h-7 text-white" />
+              <div className="md:hidden relative">
+                <button onClick={() => setAccountDropdown(!accountDropdown)} className="hover:text-[#FF8C00] transition">
+                  <User className="w-6 h-6" />
                 </button>
 
-                <div
-                  className={`absolute right-0 top-full mt-3 w-72 bg-white text-black rounded-lg shadow-xl transition-all duration-300 origin-top
-                    ${accountDropdown ? "opacity-100 scale-100" : "opacity-0 scale-95 pointer-events-none"}
-                  `}
-                >
-                  <div className="p-4 space-y-3">
-                    <div className="w-full! bg-[#FF8C00] text-white! uppercase py-2 rounded text-center">
-                      <Link href={'/login'} className="text-white!">
-                        LOGIN
-                      </Link>
+                {accountDropdown && (
+                  <div className="absolute right-0 mt-2 w-64 bg-white text-gray-800 rounded-lg shadow-xl py-4 px-6">
+                    <div className="space-y-3">
+                      <div>
+                        <p className="font-semibold mb-2">Login / Signup</p>
+                        <p className="text-sm text-gray-600 mb-3">My account</p>
+                        <Link href="/login" target="_blank" className="block w-full bg-[#3b82f6] text-white py-2 rounded-lg font-semibold hover:bg-[#2563eb] transition text-center">
+                          Login
+                        </Link>
+                      </div>
+                      <div className="border-t pt-3">
+                        <Link href="/login" target="_blank" className="text-sm text-[#3b82f6] hover:underline block mb-2">
+                          New customer? Create your account
+                        </Link>
+                        <Link href="/login" target="_blank" className="text-sm text-gray-600 hover:underline block">
+                          Lost password? Recover password
+                        </Link>
+                      </div>
                     </div>
-                    <p className="text-sm">
-                      New customer? <span className="text-[#FF8C00]">Create your account</span>
-                    </p>
-                    <p className="text-sm text-gray-500">
-                      Lost password? <span className="text-[#FF8C00]">Recover password</span>
-                    </p>
                   </div>
-                </div>
+                )}
               </div>
 
-              <button onClick={() => dispatch(openCart())} className="flex items-center gap-2">
+              <button onClick={() => dispatch(openCart())} className="flex items-center gap-2 hover:text-[#FF8C00] transition">
                 <div className="relative">
-                  <ShoppingCart className="w-7 h-7 text-white" />
-                  {cartCount >= 0 && (
-                    <span className="absolute -top-2 -right-2 bg-[#FF8C00] text-white text-sm font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                  <ShoppingCart className="w-8 h-8" />
+                  {cartCount > 0 && (
+                    <span className="absolute -top-2 -right-2 bg-[#FF8C00] text-white text-sm font-bold rounded-full w-6 h-6 flex items-center justify-center">
                       {cartCount}
                     </span>
                   )}
                 </div>
-                <span className="hidden lg:block text-md text-white">Cart</span>
+                <span className="hidden sm:block font-semibold text-lg">Cart</span>
               </button>
             </div>
           </div>
 
           {showMobileSearch && (
-             <form
-              onSubmit={handleSearch}
-              className="md:hidden mt-3"
-            >
+            <form onSubmit={handleSearch} className="md:hidden mt-3">
               <div className="relative">
                 <input
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Search..."
-                  className="w-full pl-5 pr-16 py-3 bg-white text-black rounded-md focus:ring-2 focus:ring-[#FF8C00]"
+                  placeholder="Search products..."
+                  className="w-full pl-4 pr-14 py-3 rounded-full bg-white text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#FF8C00]"
                 />
-                <button
-                  type="submit"
-                  className="absolute right-0 top-0 h-full px-4 bg-[#FF8C00] rounded-r-md flex items-center justify-center"
-                >
-                  <Search className="w-5 h-5 text-white" />
+                <button type="submit" className={`absolute right-2 top-1/2 -translate-y-1/2 bg-[#FF8C00] text-white p-2 rounded-full ${isSearching ? 'animate-spin' : ''}`}>
+                  <Search className="w-5 h-5" />
                 </button>
               </div>
             </form>
@@ -221,6 +215,7 @@ export default function Header() {
 
             </nav>
           </div>
+        )}
       </div>
 
       {/* Bottom Menu - Disparait au scroll */}
@@ -270,7 +265,7 @@ export default function Header() {
               </Link>
             </nav>
 
-            <a href="tel:8775000282" className="flex items-center gap-2 text-white! bg-black/10 rounded-2xl p-2 overflow-hidden">
+            <div className="flex items-center gap-2">
               <Image 
                 src="https://flagcdn.com/w40/us.png" 
                 alt="US" 
@@ -278,9 +273,9 @@ export default function Header() {
                 height={16}
                 className="rounded"
               />
-              <span  className="text-base font-semibold transition whitespace-nowrap">
+              <a href="tel:8775000282" className="text-base font-semibold hover:text-[#FF8C00] transition whitespace-nowrap">
                 (877) 500‑0282
-              </span>
+              </a>
 
               {/* Currency & Language Selector - Combined */}
               {/* <div className="relative hidden sm:block">

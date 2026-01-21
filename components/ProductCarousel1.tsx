@@ -1,3 +1,4 @@
+'use client'
 import { useEffect, useMemo, useState } from "react"
 import { ChevronLeft, ChevronRight } from "lucide-react"
 import ProductCard2 from "./ProductCard2"

@@ -42,7 +42,8 @@ export default function Header() {
               
               <Link href="/" className="flex-shrink-0">
                 <Image 
-                  src="/ref/logo.png" 
+                  //src="/ref/logo.png" 
+                  src="https://cdn.shopify.com/s/files/1/2609/9556/files/bitcoin-merch-logoeu_150x@2x.png?v=1767374567" 
                   alt="Bitcoin Merch" 
                   width={200}
                   height={60}
@@ -178,7 +179,7 @@ export default function Header() {
         {mobileMenuOpen && (
           <div className="md:hidden border-t border-white/20 bg-[#3b82f6]">
             <nav className="w-full max-w-[90%] mx-auto px-5 py-4 flex flex-col gap-3">
-              <Link href="/collections/lucky-miners" className="text-base font-semibold hover:text-[#FF8C00] transition py-2">
+              <Link href="/collections/lucky-miners" className="py-3 border-b border-white/10 text-sm font-medium hover:text-[#f18a1d] transition">
                 Lucky Miners
               </Link>
               <Link href="/collections/bitaxe-miners" className="text-base font-semibold hover:text-[#FF8C00] transition py-2">
@@ -193,10 +194,10 @@ export default function Header() {
               <Link href="/reviews" className="text-base font-semibold hover:text-[#FF8C00] transition py-2">
                 Reviews
               </Link>
-              <Link href="/pool" className="text-base font-semibold hover:text-[#FF8C00] transition py-2">
+              <Link href="/pool" className="py-3 border-b border-white/10 text-sm font-medium hover:text-[#f18a1d] transition">
                 Pool
               </Link>
-              <Link href="/support" className="text-base font-semibold hover:text-[#FF8C00] transition py-2">
+              <Link href="/support" className="py-3 border-b border-white/10 text-sm font-medium hover:text-[#f18a1d] transition">
                 Support
               </Link>
               
@@ -212,28 +213,6 @@ export default function Header() {
                 </a>
               </div>
 
-              <div className="border-t border-white/20 pt-4 mt-2">
-                <h3 className="text-white font-bold text-sm mb-3">Follow Us</h3>
-                <div className="flex gap-3">
-                  <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" className="bg-white/10 p-2 rounded hover:bg-[#FF8C00] transition">
-                    <Facebook className="w-5 h-5" />
-                  </a>
-                  <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" className="bg-white/10 p-2 rounded hover:bg-[#FF8C00] transition">
-                    <Twitter className="w-5 h-5" />
-                  </a>
-                  <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="bg-white/10 p-2 rounded hover:bg-[#FF8C00] transition">
-                    <Instagram className="w-5 h-5" />
-                  </a>
-                  <a href="https://youtube.com" target="_blank" rel="noopener noreferrer" className="bg-white/10 p-2 rounded hover:bg-[#FF8C00] transition">
-                    <Youtube className="w-5 h-5" />
-                  </a>
-                  <a href="https://tiktok.com" target="_blank" rel="noopener noreferrer" className="bg-white/10 p-2 rounded hover:bg-[#FF8C00] transition">
-                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                      <path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-5.2 1.74 2.89 2.89 0 012.31-4.64 2.93 2.93 0 01.88.13V9.4a6.84 6.84 0 00-1-.05A6.33 6.33 0 005 20.1a6.34 6.34 0 0010.86-4.43v-7a8.16 8.16 0 004.77 1.52v-3.4a4.85 4.85 0 01-1-.1z"/>
-                    </svg>
-                  </a>
-                </div>
-              </div>
             </nav>
           </div>
         )}
@@ -245,13 +224,17 @@ export default function Header() {
           <div className="flex items-center justify-between py-4">
             <nav className="flex items-center gap-10 flex-wrap">
               <Link href="/collections/lucky-miners" className="flex items-center gap-1.5 text-base font-semibold hover:text-[#FF8C00] transition">
-                <Pickaxe className="w-5 h-5 flex-shrink-0" />
+                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 640 512">
+                    <path d="M274.9 34.3c-28.1-28.1-73.7-28.1-101.8 0L34.3 173.1c-28.1 28.1-28.1 73.7 0 101.8L173.1 413.7c28.1 28.1 73.7 28.1 101.8 0L413.7 274.9c28.1-28.1 28.1-73.7 0-101.8L274.9 34.3zM200 224a24 24 0 1 1 48 0 24 24 0 1 1 -48 0zM96 200a24 24 0 1 1 0 48 24 24 0 1 1 0-48zM224 376a24 24 0 1 1 0-48 24 24 0 1 1 0 48zM352 200a24 24 0 1 1 0 48 24 24 0 1 1 0-48zM224 120a24 24 0 1 1 0-48 24 24 0 1 1 0 48zm96 328c0 35.3 28.7 64 64 64H576c35.3 0 64-28.7 64-64V256c0-35.3-28.7-64-64-64H461.7c11.6 36 3.1 77-25.4 105.5L320 413.8V448zM480 328a24 24 0 1 1 0 48 24 24 0 1 1 0-48z"/>
+                  </svg>
                 <div className="flex flex-col leading-tight">
                   <span>Mineurs chanceux</span>
                 </div>
               </Link>
               <Link href="/collections/bitaxe-miners" className="flex items-center gap-1.5 text-base font-semibold hover:text-[#FF8C00] transition">
-                <Box className="w-5 h-5 flex-shrink-0" />
+                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 512 512">
+                    <path d="M176 24c0-13.3-10.7-24-24-24s-24 10.7-24 24V64c-35.3 0-64 28.7-64 64H24c-13.3 0-24 10.7-24 24s10.7 24 24 24H64v56H24c-13.3 0-24 10.7-24 24s10.7 24 24 24H64v56H24c-13.3 0-24 10.7-24 24s10.7 24 24 24H64c0 35.3 28.7 64 64 64v40c0 13.3 10.7 24 24 24s24-10.7 24-24V448h56v40c0 13.3 10.7 24 24 24s24-10.7 24-24V448h56v40c0 13.3 10.7 24 24 24s24-10.7 24-24V448c35.3 0 64-28.7 64-64h40c13.3 0 24-10.7 24-24s-10.7-24-24-24H448V280h40c13.3 0 24-10.7 24-24s-10.7-24-24-24H448V176h40c13.3 0 24-10.7 24-24s-10.7-24-24-24H448c0-35.3-28.7-64-64-64V24c0-13.3-10.7-24-24-24s-24 10.7-24 24V64H280V24c0-13.3-10.7-24-24-24s-24 10.7-24 24V64H176V24zM160 128H352c17.7 0 32 14.3 32 32V352c0 17.7-14.3 32-32 32H160c-17.7 0-32-14.3-32-32V160c0-17.7 14.3-32 32-32zm192 32H160V352H352V160z"/>
+                  </svg>
                 <div className="flex flex-col leading-tight">
                   <span>Mineurs de Bitaxe</span>
                 </div>

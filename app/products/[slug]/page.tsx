@@ -14,7 +14,7 @@ import {
 import QuickView from '@/components/QuickView'
 import ReviewsCarousel from '@/components/Reviewscarousel' // à adapter si tu veux Judge.me style
 import ProductCarousel2 from '@/components/ProductCarousel2'
-import { getProducts } from '@/app/collections/lucky-miners/page'
+import { getProducts, getProductBySlug } from '@/lib/api/products'
 
 async function getProduct(slug: string) {
   try {

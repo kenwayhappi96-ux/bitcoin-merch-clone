@@ -10,9 +10,13 @@ import type { Product } from '@/types'
 
 interface ProductCardProps {
   product: Product
+  showQuickView?: boolean  // true par défaut → activé sur collections, false sur homepage
 }
 
-export default function ProductCard({ product }: ProductCardProps) {
+export default function ProductCard({
+  product,
+  showQuickView = true,
+}: ProductCardProps) {
   const dispatch = useAppDispatch()
   const [isQuickViewOpen, setIsQuickViewOpen] = useState(false)
 
@@ -29,76 +33,80 @@ export default function ProductCard({ product }: ProductCardProps) {
   }
 
   const mainImage = product.image || '/ref/logo.png'
-  const discountedPrice = product.discountPrice || product.price
+  const displayPrice = product.discountPrice || product.price
 
   return (
     <>
-      <div className="flex flex-col gap-3 bg-white overflow-hidden">
-        {/* IMAGE */}
+      <div className="group flex flex-col bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-xl transition-shadow duration-300">
+        {/* Image */}
         <Link
           href={`/products/${product.slug}`}
-          className="block relative w-full aspect-square overflow-hidden"
+          className="relative w-full aspect-square overflow-hidden"
         >
           <Image
             src={mainImage}
             alt={product.name}
             fill
-            className="object-cover"
+            className="object-cover group-hover:scale-105 transition-transform duration-500"
           />
         </Link>
 
-        {/* TITLE */}
-        <Link href={`/products/${product.slug}`} className="text-black">
-          <h3 className="text-sm sm:text-base lg:text-[18px] line-clamp-2 font-[400]">
-            Bitcoin Merch® - {product.name}
-          </h3>
-        </Link>
+        {/* Infos */}
+        <div className="p-4 flex flex-col flex-grow text-center">
+          <Link href={`/products/${product.slug}`}>
+            <h3 className="text-base font-medium text-gray-900 line-clamp-2 mb-3 min-h-[2.5rem]">
+              Bitcoin Merch® - {product.name}
+            </h3>
+          </Link>
 
-        {/* PRICE */}
-        <div className="flex justify-center items-center gap-1">
-          {product.discountPrice ? (
-            <>
-              <span className="text-[#FF8C00] text-sm sm:text-base">
-                ${discountedPrice.toFixed(2)}
-              </span>
-              <span className="text-gray-500 line-through text-sm sm:text-base">
+          {/* Prix */}
+          <div className="mb-4">
+            {product.discountPrice ? (
+              <div className="flex items-center justify-center gap-3">
+                <span className="text-xl font-bold text-[#FF8C00]">
+                  ${displayPrice.toFixed(2)}
+                </span>
+                <span className="text-sm text-gray-500 line-through">
+                  ${product.price.toFixed(2)}
+                </span>
+              </div>
+            ) : (
+              <span className="text-xl font-bold text-gray-900">
                 ${product.price.toFixed(2)}
               </span>
-            </>
-          ) : (
-            <span className="text-black text-sm sm:text-base">
-              ${product.price.toFixed(2)}
-            </span>
-          )}
-        </div>
+            )}
+          </div>
 
-        {/* ACTIONS */}
-        <div className="flex flex-col gap-2">
-          {/* ADD TO CART (visible partout) */}
-          <button
-            onClick={handleAddToCart}
-            disabled={!product.inStock}
-            className="w-full bg-[#fd9619] text-white uppercase text-xs sm:text-sm px-2 py-2 hover:bg-gray-500 transition disabled:bg-gray-300 disabled:cursor-not-allowed"
-          >
-            ADD TO CART
-          </button>
+          {/* Boutons */}
+          <div className="mt-auto space-y-2">
+            <button
+              onClick={handleAddToCart}
+              disabled={!product.inStock}
+              className="w-full bg-[#fd9619] text-white font-medium uppercase text-sm py-3 rounded-md hover:bg-[#e08516] transition disabled:bg-gray-400 disabled:cursor-not-allowed"
+            >
+              ADD TO CART
+            </button>
 
-          {/* QUICK VIEW (desktop seulement) */}
-          <button
-            onClick={() => setIsQuickViewOpen(true)}
-            className="hidden lg:flex w-full bg-white text-black uppercase text-sm px-2 py-2 border border-black hover:bg-black hover:text-white transition items-center justify-center"
-          >
-            QUICK VIEW
-          </button>
+            {showQuickView && (
+              <button
+                onClick={() => setIsQuickViewOpen(true)}
+                className="w-full bg-white text-gray-900 font-medium uppercase text-sm py-3 rounded-md border border-gray-900 hover:bg-gray-900 hover:text-white transition"
+              >
+                QUICK VIEW
+              </button>
+            )}
+          </div>
         </div>
       </div>
 
-      {/* QUICK VIEW MODAL */}
-      <ProductQuickView
-        product={product}
-        isOpen={isQuickViewOpen}
-        onClose={() => setIsQuickViewOpen(false)}
-      />
+      {/* Modal Quick View */}
+      {showQuickView && (
+        <ProductQuickView
+          product={product}
+          isOpen={isQuickViewOpen}
+          onClose={() => setIsQuickViewOpen(false)}
+        />
+      )}
     </>
   )
 }

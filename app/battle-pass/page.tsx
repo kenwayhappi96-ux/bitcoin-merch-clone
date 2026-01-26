@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { Star, Gift, Check, Store, Flag, Truck, DollarSign, ShoppingBasket, ShoppingCart } from 'lucide-react'
 import Image from 'next/image'
-import { getProducts } from '../collections/lucky-miners/page'
+import { getProducts } from '@/lib/api/products'   // ← importe depuis ici
 import { useEffect, useState } from 'react'
 import QuickView from '@/components/QuickView'
 import ReviewsCarousel from '@/components/Reviewscarousel'

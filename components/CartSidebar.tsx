@@ -29,28 +29,33 @@ export default function CartSidebar() {
       {/* Sidebar */}
       <div className="fixed top-0 right-0 h-full w-full max-w-md bg-white shadow-2xl z-50 flex flex-col">
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b bg-[#3b82f6]">
-          <h2 className="text-xl font-bold text-white">Cart {items.length}</h2>
+        <div className="flex items-center justify-between p-6 border-b bg-white">
+          <h2 className="text-xl font-bold text-black inline-flex gap-3 items-center">
+            Cart 
+            <span className='text-[#f18a1d] text-[14px]!'>{items.length}</span>
+          </h2>
           <button
             onClick={() => dispatch(closeCart())}
-            className="text-white hover:bg-white/20 rounded-full p-2 transition"
+            className="text-black bg-[#f8f8f8] p-2 transition"
           >
             <X className="w-6 h-6" />
           </button>
         </div>
 
         {/* Items */}
-        <div className="flex-1 overflow-y-auto p-6">
+        <div className="flex-1 p-6">
           {items.length === 0 ? (
-            <div className="text-center py-12">
-              <ShoppingBag className="w-16 h-16 mx-auto text-gray-300 mb-4" />
-              <p className="text-gray-500 text-lg">Your cart is empty</p>
-              <button
-                onClick={() => dispatch(closeCart())}
-                className="mt-6 text-[#3b82f6] font-semibold hover:underline"
-              >
-                Continue Shopping
-              </button>
+            <div className="text-center flex items-center justify-center flex-col m-5 gap-1.25 h-full overflow-hidden">
+              <img src="https://navidium-static-assets.s3.amazonaws.com/dynamatic-cart/cart-empty.png" alt="" className="w-25"/>
+              <h3 className="text-black text-[16px] m-0 font-semibold">No products in cart.</h3>
+              <Link href={'/collections/all'} className='cart-nav'>
+                <button
+                  onClick={() => dispatch(closeCart())}
+                  className="cursor-pointer hover:text-white text-black font-semibold h-8.75 rounded-md px-3 hover:underline border border-blue-400 bg-gray-300 hover:bg-blue-400"
+                >
+                  Continue Shopping
+                </button>
+              </Link>
             </div>
           ) : (
             <div className="space-y-6">

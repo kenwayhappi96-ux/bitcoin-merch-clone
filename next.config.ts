@@ -15,6 +15,10 @@ const nextConfig: NextConfig = {
         protocol: 'https',
         hostname: 'via.placeholder.com',
       },
+      {
+        protocol: 'https',
+        hostname:'navidium-static-assets.s3.amazonaws.com'
+      }
     ],
   },
 };

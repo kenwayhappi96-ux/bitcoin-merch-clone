@@ -1,80 +1,94 @@
 // app/products/[slug]/page.tsx
-// Toujours Server Component (pas de 'use client' ici)
+// Toujours un Server Component → pas de 'use client' ici
 
 import { notFound } from 'next/navigation'
 import Image from 'next/image'
 import Link from 'next/link'
 import {
-  Store, Flag, Truck,
-  Check, Star, Zap, Cpu, ShieldCheck,
-  DollarSign, Gift, ShoppingBasket, ShoppingCart,
-  ChevronDown // pour accordion
+  Store,
+  Flag,
+  Truck,
+  Check,
+  Star,
+  Zap,
+  Cpu,
+  ShieldCheck,
+  DollarSign,
+  Gift,
+  ShoppingBasket,
+  ShoppingCart,
+  ChevronDown,
 } from 'lucide-react'
 
 import QuickView from '@/components/QuickView'
-import ReviewsCarousel from '@/components/Reviewscarousel' // à adapter si tu veux Judge.me style
+import ReviewsCarousel from '@/components/Reviewscarousel'
 import ProductCarousel2 from '@/components/ProductCarousel2'
 import { getProducts, getProductBySlug } from '@/lib/api/products'
 
-async function getProduct(slug: string) {
-  try {
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? "http://localhost:3000"
-    const res = await fetch(`${baseUrl}/api/products`, { cache: "no-store" })
-    if (!res.ok) return null
-    const data = await res.json()
-    if (!data?.products) return null
-    return data.products.find((p: any) => p.slug === slug) ?? null
-  } catch (err) {
-    console.error(err)
-    return null
-  }
+// Typage minimal (adapte selon ton type Product réel)
+type Product = {
+  id: number
+  slug: string
+  name: string
+  price: number
+  discountPrice?: number
+  originalPrice?: number
+  image?: string
+  description?: string
+  category?: string
+  inStock?: boolean
 }
 
-async function getProductImages(productId: number) {
-  try {
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"
-    const res = await fetch(`${baseUrl}/api/products/${productId}/images`, { cache: "no-store" })
-    if (!res.ok) return []
-    const data = await res.json()
-    return data.images?.filter((img: any) => img.is_primary === 0).map((img: any) => img.image_url) || []
-  } catch (err) {
-    console.error(err)
-    return []
-  }
-}
-
-export default async function ProductDetailPage({ params }: { params: Promise<{ slug: string }> }) {
+export default async function ProductDetailPage({
+  params,
+}: {
+  params: Promise<{ slug: string }>
+}) {
   const { slug } = await params
-  const product = await getProduct(slug)
-  if (!product) notFound()
 
+  // Récupération du produit principal
+  const product = await getProductBySlug(slug)
+  if (!product) {
+    notFound()
+  }
+
+  // Récupération des images secondaires
   const secondaryImages = await getProductImages(product.id)
-  const { products } = await getProducts() || { products: [] }
 
-  const price = product.discountPrice || product.price
-  const comparePrice = product.originalPrice || product.price
+  // Récupération de TOUS les produits (pour carousel "winners" et "you may also like")
+  const allProductsData = await getProducts()
+  const products: Product[] = Array.isArray(allProductsData)
+    ? allProductsData
+    : allProductsData?.products ?? [] // gestion robuste si API renvoie { products: [...] }
+
+  // Prix et promo
+  const price = product.discountPrice ?? product.price
+  const comparePrice = product.originalPrice ?? product.price
   const hasDiscount = price < comparePrice
 
-  // Exemple de parsing description (adapte selon format réel de ta BD)
-  const perks = product.description
-    ?.split('\n')
-    ?.filter((l: string) => l.trim().startsWith('✔️') || l.trim())
-    ?.map((l: string) => l.replace('✔️', '').trim()) || []
+  // Parsing perks depuis description (adapte selon format réel)
+  const perks =
+    product.description
+      ?.split('\n')
+      ?.filter((line) => line.trim().startsWith('✔️') || line.trim())
+      ?.map((line) => line.replace('✔️', '').trim()) ?? []
+
+  // Produits recommandés (8 premiers, ou vide si aucun)
+  const recommendedProducts = products.length > 0 ? products.slice(0, 8) : []
 
   return (
     <main className="min-h-screen bg-white">
-      {/* 1. Hero principal (image + prix + avantages + CTA) */}
+      {/* 1. Hero principal */}
       <section className="pt-12 pb-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
         <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 items-start">
-          {/* Colonne gauche : images / vidéo */}
+          {/* Images / Vidéo */}
           <div className="space-y-6">
             <div className="relative aspect-square rounded-2xl overflow-hidden shadow-2xl border border-gray-200">
               <QuickView product={product} secondaryImages={secondaryImages} isPage />
             </div>
 
-            {/* Vidéo démo principale (comme sur le site) */}
             <video
-              src="https://cdn.shopify.com/videos/c/o/v/7b4488231e114c728c165a578902c405.mp4" // remplace par la tienne
+              src="https://cdn.shopify.com/videos/c/o/v/7b4488231e114c728c165a578902c405.mp4"
               autoPlay
               loop
               muted
@@ -84,7 +98,7 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
             />
           </div>
 
-          {/* Colonne droite : titre, prix, avantages, CTA */}
+          {/* Infos produit + CTA */}
           <div className="flex flex-col gap-6 lg:sticky lg:top-8">
             <h1 className="text-4xl md:text-5xl font-bold text-gray-900 leading-tight">
               {product.name}
@@ -102,14 +116,13 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
               )}
             </div>
 
-            {/* Sous-titre accroche */}
             <p className="text-xl md:text-2xl font-medium text-gray-800">
               6x the machines - 6x the odds to mine a block!
             </p>
 
-            {/* Liste avantages */}
+            {/* Avantages */}
             <ul className="space-y-4 text-lg text-gray-800">
-              {perks.map((perk: string, i: number) => (
+              {perks.map((perk, i) => (
                 <li key={i} className="flex items-start gap-3">
                   <Check className="w-6 h-6 text-green-600 flex-shrink-0 mt-1" />
                   <span>{perk}</span>
@@ -125,7 +138,7 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
               </p>
             </div>
 
-            {/* CTA principaux */}
+            {/* CTA */}
             <div className="mt-6 space-y-4">
               <button className="w-full bg-orange-600 hover:bg-orange-700 text-white font-bold text-xl py-5 rounded-xl shadow-lg transition-all transform hover:scale-[1.02]">
                 👉 Start Mining Now
@@ -142,7 +155,7 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
         </div>
       </section>
 
-      {/* 2. Section livraison (3 icônes) */}
+      {/* 2. Section livraison */}
       <section className="bg-[#0036cc] text-white py-16">
         <div className="max-w-6xl mx-auto px-6">
           <div className="grid md:grid-cols-3 gap-10 text-center">
@@ -158,23 +171,15 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
               <Truck className="w-14 h-14 text-[#f5a623]" />
               <h3 className="text-2xl font-medium">Germany → All Of Europe</h3>
             </div>
-
-            {/* Divider */}
-            <div className="hidden md:block w-px h-12 bg-gray-300" />
-
-            {/* Button */}
-            <button className="bg-orange-500 hover:bg-orange-600 transition text-white font-bold px-8 py-3 rounded">
-              WRITE A REVIEW
-            </button>
           </div>
         </div>
       </section>
 
-      {/* 3. Sections Flip vidéo + texte (exemples) */}
+      {/* 3. Flip vidéo + texte */}
       <section className="py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto bg-gradient-to-b from-gray-50 to-white">
         <div className="grid lg:grid-cols-2 gap-12 items-center">
           <video
-            src="https://cdn.shopify.com/videos/c/o/v/3911c99bc2674dfcb48ed1e1d96cae4d.mp4" // remplace
+            src="https://cdn.shopify.com/videos/c/o/v/3911c99bc2674dfcb48ed1e1d96cae4d.mp4"
             autoPlay
             loop
             muted
@@ -185,8 +190,7 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
 
           <div className="space-y-6">
             <h2 className="text-4xl md:text-5xl font-bold text-gray-900">
-              All-year Bitcoin mining for just{' '}
-              <span className="text-[#f5a623]">66 cents</span> of electricity a month
+              All-year Bitcoin mining for just <span className="text-[#f5a623]">66 cents</span> of electricity a month
             </h2>
             <p className="text-xl text-gray-700 leading-relaxed">
               Scared of the heavy electricity bills often associated with typical BTC mining? Each device runs 24/7 at just 24 watts per day — only ~$0.66/month for 6 miners.
@@ -196,16 +200,20 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
         </div>
       </section>
 
-      {/* Autres sections flip similaires... */}
-
-      {/* 4. Carousel Winners (Recent Lucky Bitcoin Winners) */}
+      {/* 4. Carousel Recent Lucky Winners */}
       <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4">
           <h2 className="text-4xl font-bold text-center mb-10">
             Recent Lucky <span className="text-[#f5a623]">Bitcoin</span> Winners
           </h2>
-          {/* Carousel d'images winners – utilise ProductCarousel2 ou un vrai slider */}
-          <ProductCarousel2 products={products.slice(0, 8)} /> {/* à adapter */}
+
+          {recommendedProducts.length > 0 ? (
+            <ProductCarousel2 products={recommendedProducts} />
+          ) : (
+            <p className="text-center text-gray-500 py-8">
+              Aucun gagnant récent à afficher pour le moment
+            </p>
+          )}
         </div>
       </section>
 
@@ -288,19 +296,18 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
               </div>
             </details>
 
-            {/* Ajoute les autres questions de la même façon */}
+            {/* Ajoute ici les autres questions au besoin */}
           </div>
         </div>
       </section>
 
-      {/* 8. Avis clients + CTA final */}
+      {/* 8. Avis clients */}
       <section className="py-16 bg-gray-50">
         <div className="max-w-7xl mx-auto px-6">
           <h2 className="text-4xl font-bold text-center mb-12">
             What our <span className="text-[#f5a623]">Customers</span> say.
           </h2>
 
-          {/* Ton ReviewsCarousel ou widget Judge.me */}
           <ReviewsCarousel />
 
           <div className="mt-12 text-center">
@@ -318,9 +325,32 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
       <section className="py-16">
         <div className="max-w-7xl mx-auto px-6">
           <h2 className="text-3xl font-bold text-center mb-10">You may also like</h2>
-          <ProductCarousel2 products={products} />
+
+          {recommendedProducts.length > 0 ? (
+            <ProductCarousel2 products={recommendedProducts} />
+          ) : (
+            <p className="text-center text-gray-500 py-8">
+              Aucun produit similaire disponible pour le moment
+            </p>
+          )}
         </div>
       </section>
     </main>
   )
+}
+
+// Fonctions helpers (peux les déplacer dans lib/api/products.ts si tu veux)
+async function getProductImages(productId: number) {
+  try {
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'
+    const res = await fetch(`${baseUrl}/api/products/${productId}/images`, {
+      cache: 'no-store',
+    })
+    if (!res.ok) return []
+    const data = await res.json()
+    return data.images?.filter((img: any) => img.is_primary === 0).map((img: any) => img.image_url) || []
+  } catch (err) {
+    console.error('Erreur images:', err)
+    return []
+  }
 }

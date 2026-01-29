@@ -10,7 +10,7 @@ export default function ConditionalLayout({ children }: { children: React.ReactN
   const pathname = usePathname()
   
   // Pages without header/footer (admin pages and login)
-  const noLayoutPages = ['/login']
+  const noLayoutPages = ['/login','/checkout']
   const isNoLayoutPage = noLayoutPages.includes(pathname) || pathname.startsWith('/admin')
 
   if (isNoLayoutPage) {

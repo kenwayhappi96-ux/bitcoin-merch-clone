@@ -6,7 +6,6 @@ import Image from 'next/image'
 import { useState } from 'react'
 import { useAppDispatch, useAppSelector } from '@/store/hooks'
 import { openCart } from '@/store/cartSlice'
-import { links, nav_link } from '@/lib/constants'
 
 export default function Header() {
   const dispatch = useAppDispatch()
@@ -37,14 +36,15 @@ export default function Header() {
         <div className="w-full max-w-[90%] mx-auto px-5 py-4">
           <div className="flex items-center justify-between gap-4">
             <div className="flex items-center gap-3">
-              <button onClick={() => setMobileMenuOpen(!mobileMenuOpen)} className="md:hidden transition cursor-pointer">
+              <button onClick={() => setMobileMenuOpen(!mobileMenuOpen)} className="md:hidden hover:text-[#FF8C00] transition">
                 {mobileMenuOpen ? <X className="w-7 h-7" /> : <Menu className="w-7 h-7" />}
               </button>
               
-              <Link href="/" className="shrink-0">
-                <Image
-                  src="/ref/logo.png"
-                  alt="Bitcoin Merch"
+              <Link href="/" className="flex-shrink-0">
+                <Image 
+                  //src="/ref/logo.png" 
+                  src="https://cdn.shopify.com/s/files/1/2609/9556/files/bitcoin-merch-logoeu_150x@2x.png?v=1767374567" 
+                  alt="Bitcoin Merch" 
                   width={200}
                   height={60}
                   className="h-10 sm:h-12 md:h-14 lg:h-16 w-auto object-contain"
@@ -74,102 +74,101 @@ export default function Header() {
             </form>
 
             <div className="flex items-center gap-4">
-              <button onClick={() => setShowMobileSearch(!showMobileSearch)} className="md:hidden cursor-pointer">
-                <Search className="w-6 h-6 text-[#0073e6]" />
+              <button onClick={() => setShowMobileSearch(!showMobileSearch)} className="md:hidden hover:text-[#FF8C00] transition">
+                <Search className="w-6 h-6" />
               </button>
 
-              <div className="relative hidden md:flex items-center gap-2">
-                <div>
-                  <Link href="/login" className="text-sm opacity-80 hover:text-[#FF8C00]">
-                    Login / Signup
-                  </Link>
-
-                  <button
-                    onClick={() => setAccountDropdown(!accountDropdown)}
-                    className="flex items-center gap-1 font-semibold"
-                  >
-                    My account
-                    <ChevronDown className="w-4 h-4" />
-                  </button>
-                </div>
-
-                {/* Dropdown */}
-                <div
-                  className={`absolute right-0 top-full mt-3 w-72 bg-white text-black rounded-lg shadow-xl transition-all duration-300 origin-top
-                    ${accountDropdown ? "opacity-100 scale-100" : "opacity-0 scale-95 pointer-events-none"}
-                  `}
-                >
-                  <div className="p-4 space-y-3">
-                    <button className="w-full bg-[#FF8C00] text-white py-2 rounded">
-                      LOGIN
+              <div className="relative hidden md:block">
+                <div className="flex items-center gap-2">
+                  <User className="w-6 h-6" />
+                  <div className="flex flex-col items-start leading-tight">
+                    <Link href="/login" target="_blank" className="text-gray-200 text-sm hover:text-[#FF8C00] transition">
+                      Login / Signup
+                    </Link>
+                    <button onClick={() => setAccountDropdown(!accountDropdown)} className="font-semibold text-base hover:text-[#FF8C00] transition flex items-center gap-1">
+                      My account
+                      <ChevronDown className="w-4 h-4" />
                     </button>
-                    <p className="text-sm">
-                      New customer? <span className="text-[#FF8C00]">Create your account</span>
-                    </p>
-                    <p className="text-sm text-gray-500">
-                      Lost password? <span className="text-[#FF8C00]">Recover password</span>
-                    </p>
                   </div>
                 </div>
-              </div>
 
+                {accountDropdown && (
+                  <div className="absolute right-0 mt-2 w-64 bg-white text-gray-800 rounded-lg shadow-xl py-4 px-6 z-50">
+                    <div className="space-y-3">
+                      <div>
+                        <p className="font-semibold mb-2">Login / Signup</p>
+                        <p className="text-sm text-gray-600 mb-3">My account</p>
+                        <Link href="/login" target="_blank" className="block w-full bg-[#3b82f6] text-white py-2 rounded-lg font-semibold hover:bg-[#2563eb] transition text-center">
+                          Login
+                        </Link>
+                      </div>
+                      <div className="border-t pt-3">
+                        <Link href="/login" target="_blank" className="text-sm text-[#3b82f6] hover:underline block mb-2">
+                          New customer? Create your account
+                        </Link>
+                        <Link href="/login" target="_blank" className="text-sm text-gray-600 hover:underline block">
+                          Lost password? Recover password
+                        </Link>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
 
               <div className="md:hidden relative">
-                <button onClick={() => setAccountDropdown(!accountDropdown)} className="opacity-80">
-                  <User className="w-6 h-6 text-[#0073e6]" />
+                <button onClick={() => setAccountDropdown(!accountDropdown)} className="hover:text-[#FF8C00] transition">
+                  <User className="w-6 h-6" />
                 </button>
 
-                <div
-                  className={`absolute right-0 top-full mt-3 w-72 bg-white text-black rounded-lg shadow-xl transition-all duration-300 origin-top
-                    ${accountDropdown ? "opacity-100 scale-100" : "opacity-0 scale-95 pointer-events-none"}
-                  `}
-                >
-                  <div className="p-4 space-y-3">
-                    <button className="w-full bg-[#FF8C00] text-white py-2 rounded">
-                      LOGIN
-                    </button>
-                    <p className="text-sm">
-                      New customer? <span className="text-[#FF8C00]">Create your account</span>
-                    </p>
-                    <p className="text-sm text-gray-500">
-                      Lost password? <span className="text-[#FF8C00]">Recover password</span>
-                    </p>
+                {accountDropdown && (
+                  <div className="absolute right-0 mt-2 w-64 bg-white text-gray-800 rounded-lg shadow-xl py-4 px-6">
+                    <div className="space-y-3">
+                      <div>
+                        <p className="font-semibold mb-2">Login / Signup</p>
+                        <p className="text-sm text-gray-600 mb-3">My account</p>
+                        <Link href="/login" target="_blank" className="block w-full bg-[#3b82f6] text-white py-2 rounded-lg font-semibold hover:bg-[#2563eb] transition text-center">
+                          Login
+                        </Link>
+                      </div>
+                      <div className="border-t pt-3">
+                        <Link href="/login" target="_blank" className="text-sm text-[#3b82f6] hover:underline block mb-2">
+                          New customer? Create your account
+                        </Link>
+                        <Link href="/login" target="_blank" className="text-sm text-gray-600 hover:underline block">
+                          Lost password? Recover password
+                        </Link>
+                      </div>
+                    </div>
                   </div>
-                </div>
+                )}
               </div>
 
-              <button onClick={() => dispatch(openCart())} className="flex items-center gap-2">
+              <button onClick={() => dispatch(openCart())} className="flex items-center gap-2 hover:text-[#FF8C00] transition">
                 <div className="relative">
-                  <ShoppingCart className="w-6 h-6 text-[#0073e6]" />
-                  {cartCount >= 0 && (
+                  <ShoppingCart className="w-8 h-8" />
+                  {cartCount > 0 && (
                     <span className="absolute -top-2 -right-2 bg-[#FF8C00] text-white text-sm font-bold rounded-full w-6 h-6 flex items-center justify-center">
                       {cartCount}
                     </span>
                   )}
                 </div>
-                <span className="hidden lg:block font-semibold text-lg text-[#0073e6]">Cart</span>
+                <span className="hidden sm:block font-semibold text-lg">Cart</span>
               </button>
             </div>
           </div>
 
           {showMobileSearch && (
-             <form
-              onSubmit={handleSearch}
-              className="md:hidden mt-3"
-            >
+            <form onSubmit={handleSearch} className="md:hidden mt-3">
               <div className="relative">
                 <input
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Search..."
-                  className="w-full pl-5 pr-16 py-3 bg-white text-black rounded-md focus:ring-2 focus:ring-[#FF8C00]"
+                  placeholder="Search products..."
+                  className="w-full pl-4 pr-14 py-3 rounded-full bg-white text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#FF8C00]"
                 />
-                <button
-                  type="submit"
-                  className="absolute right-0 top-0 h-full px-4 bg-[#FF8C00] rounded-r-md flex items-center justify-center"
-                >
-                  <Search className="w-5 h-5 text-white" />
+                <button type="submit" className={`absolute right-2 top-1/2 -translate-y-1/2 bg-[#FF8C00] text-white p-2 rounded-full ${isSearching ? 'animate-spin' : ''}`}>
+                  <Search className="w-5 h-5" />
                 </button>
               </div>
             </form>
@@ -177,65 +176,46 @@ export default function Header() {
         </div>
 
         {/* Mobile Menu - À l'intérieur de la section sticky */}
-          <div className={`md:hidden mobile-menu`} aria-hidden={!mobileMenuOpen}>
-            <div className="mobile-menu__inner">
-              <div className="mobile-menu__panel">
-                <nav className="px-6 py-6 space-y-6 text-[#0036cc]">
-                  {[
-                    "Lucky Miners",
-                    "Bitaxe Miners",
-                    "Battle Pass",
-                    "Video Guides",
-                    "Reviews",
-                    "Pool",
-                    "Support",
-                  ].map((item) => (
-                    <Link key={item} href="#" className="block">
-                      {item}
-                    </Link>
-                  ))}
-
-                  <div className="pt-6 border-t border-t-gray-300">
-                    <h3 className="font-bold text-black mb-3 text-center">NEED HELP?</h3>
-                    <div className='flex items-center'>
-                      <svg focusable="false" className="icon icon--bi-phone " viewBox="0 0 24 24" role="presentation">
-                        <g stroke-width="2" fill="none" fill-rule="evenodd" stroke-linecap="square">
-                          <path d="M17 15l-3 3-8-8 3-3-5-5-3 3c0 9.941 8.059 18 18 18l3-3-5-5z" stroke="#000000"></path>
-                          <path d="M14 1c4.971 0 9 4.029 9 9m-9-5c2.761 0 5 2.239 5 5" stroke="#f18a1d"></path>
-                        </g>
-                      </svg>
-                      <span className='text-black!'>8775000282</span>
-                    </div>
-                    <div className='flex items-center'>
-                      <svg focusable="false" className="icon icon--bi-email " viewBox="0 0 22 22" role="presentation">
-                        <g fill="none" fill-rule="evenodd">
-                          <path stroke="#f18a1d" d="M.916667 10.08333367l3.66666667-2.65833334v4.65849997zm20.1666667 0L17.416667 7.42500033v4.65849997z"></path>
-                          <path stroke="#000000" stroke-width="2" d="M4.58333367 7.42500033L.916667 10.08333367V21.0833337h20.1666667V10.08333367L17.416667 7.42500033"></path>
-                          <path stroke="#000000" stroke-width="2" d="M4.58333367 12.1000003V.916667H17.416667v11.1833333m-16.5-2.01666663L21.0833337 21.0833337m0-11.00000003L11.0000003 15.5833337"></path>
-                          <path d="M8.25000033 5.50000033h5.49999997M8.25000033 9.166667h5.49999997" stroke="#f18a1d" stroke-width="2" stroke-linecap="square"></path>
-                        </g>
-                      </svg>
-                      <a href="mailto:support@bitcoinmerch.com" target="_blank" rel="noopener" aria-describedby="a11y-new-window-message">support@bitcoinmerch.com</a>
-                    </div>
-                  </div>
-
-                  <div className="pt-6 border-t border-t-gray-300 mb-4">
-                    <h3 className="font-bold text-black mb-3 text-center">FOLLOW US</h3>
-                    <div className="flex flex-col gap-4">
-                      {
-                        links.map((item)=>(
-                          <Link key={item.name} href={item.link} className='flex gap-2 items-center'>
-                            <item.icon/>
-                            <span>{item.name}</span>
-                          </Link>
-                        ))
-                      }
-                    </div>
-                  </div>
-                </nav>
+        {mobileMenuOpen && (
+          <div className="md:hidden border-t border-white/20 bg-[#3b82f6]">
+            <nav className="w-full max-w-[90%] mx-auto px-5 py-4 flex flex-col gap-3">
+              <Link href="/collections/lucky-miners" className="py-3 border-b border-white/10 text-sm font-medium hover:text-[#f18a1d] transition">
+                Lucky Miners
+              </Link>
+              <Link href="/collections/bitaxe-miners" className="text-base font-semibold hover:text-[#FF8C00] transition py-2">
+                Bitaxe Miners
+              </Link>
+              <Link href="/battle-pass" className="text-base font-semibold hover:text-[#FF8C00] transition py-2">
+                Battle Pass
+              </Link>
+              <Link href="/video-guides" className="text-base font-semibold hover:text-[#FF8C00] transition py-2">
+                Video Guides
+              </Link>
+              <Link href="/reviews" className="text-base font-semibold hover:text-[#FF8C00] transition py-2">
+                Reviews
+              </Link>
+              <Link href="/pool" className="py-3 border-b border-white/10 text-sm font-medium hover:text-[#f18a1d] transition">
+                Pool
+              </Link>
+              <Link href="/support" className="py-3 border-b border-white/10 text-sm font-medium hover:text-[#f18a1d] transition">
+                Support
+              </Link>
+              
+              <div className="border-t border-white/20 pt-4 mt-2">
+                <h3 className="text-white font-bold text-sm mb-3">Need help?</h3>
+                <a href="tel:8775000282" className="flex items-center gap-2 text-base hover:text-[#FF8C00] transition py-1">
+                  <Phone className="w-4 h-4" />
+                  8775000282
+                </a>
+                <a href="mailto:support@bitcoinmerch.com" className="flex items-center gap-2 text-base hover:text-[#FF8C00] transition py-1 mt-2">
+                  <Mail className="w-4 h-4" />
+                  support@bitcoinmerch.com
+                </a>
               </div>
-            </div>
+
+            </nav>
           </div>
+        )}
       </div>
 
       {/* Bottom Menu - Disparait au scroll */}
@@ -244,13 +224,17 @@ export default function Header() {
           <div className="flex items-center justify-between py-4">
             <nav className="flex items-center gap-10 flex-wrap">
               <Link href="/collections/lucky-miners" className="flex items-center gap-1.5 text-base font-semibold hover:text-[#FF8C00] transition">
-                <Pickaxe className="w-5 h-5 flex-shrink-0" />
+                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 640 512">
+                    <path d="M274.9 34.3c-28.1-28.1-73.7-28.1-101.8 0L34.3 173.1c-28.1 28.1-28.1 73.7 0 101.8L173.1 413.7c28.1 28.1 73.7 28.1 101.8 0L413.7 274.9c28.1-28.1 28.1-73.7 0-101.8L274.9 34.3zM200 224a24 24 0 1 1 48 0 24 24 0 1 1 -48 0zM96 200a24 24 0 1 1 0 48 24 24 0 1 1 0-48zM224 376a24 24 0 1 1 0-48 24 24 0 1 1 0 48zM352 200a24 24 0 1 1 0 48 24 24 0 1 1 0-48zM224 120a24 24 0 1 1 0-48 24 24 0 1 1 0 48zm96 328c0 35.3 28.7 64 64 64H576c35.3 0 64-28.7 64-64V256c0-35.3-28.7-64-64-64H461.7c11.6 36 3.1 77-25.4 105.5L320 413.8V448zM480 328a24 24 0 1 1 0 48 24 24 0 1 1 0-48z"/>
+                  </svg>
                 <div className="flex flex-col leading-tight">
                   <span>Mineurs chanceux</span>
                 </div>
               </Link>
               <Link href="/collections/bitaxe-miners" className="flex items-center gap-1.5 text-base font-semibold hover:text-[#FF8C00] transition">
-                <Box className="w-5 h-5 flex-shrink-0" />
+                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 512 512">
+                    <path d="M176 24c0-13.3-10.7-24-24-24s-24 10.7-24 24V64c-35.3 0-64 28.7-64 64H24c-13.3 0-24 10.7-24 24s10.7 24 24 24H64v56H24c-13.3 0-24 10.7-24 24s10.7 24 24 24H64v56H24c-13.3 0-24 10.7-24 24s10.7 24 24 24H64c0 35.3 28.7 64 64 64v40c0 13.3 10.7 24 24 24s24-10.7 24-24V448h56v40c0 13.3 10.7 24 24 24s24-10.7 24-24V448h56v40c0 13.3 10.7 24 24 24s24-10.7 24-24V448c35.3 0 64-28.7 64-64h40c13.3 0 24-10.7 24-24s-10.7-24-24-24H448V280h40c13.3 0 24-10.7 24-24s-10.7-24-24-24H448V176h40c13.3 0 24-10.7 24-24s-10.7-24-24-24H448c0-35.3-28.7-64-64-64V24c0-13.3-10.7-24-24-24s-24 10.7-24 24V64H280V24c0-13.3-10.7-24-24-24s-24 10.7-24 24V64H176V24zM160 128H352c17.7 0 32 14.3 32 32V352c0 17.7-14.3 32-32 32H160c-17.7 0-32-14.3-32-32V160c0-17.7 14.3-32 32-32zm192 32H160V352H352V160z"/>
+                  </svg>
                 <div className="flex flex-col leading-tight">
                   <span>Mineurs de Bitaxe</span>
                 </div>
@@ -281,7 +265,7 @@ export default function Header() {
               </Link>
             </nav>
 
-            <a href="tel:8775000282" className="flex items-center gap-2 text-white! bg-black/10 rounded-2xl p-2 overflow-hidden">
+            <div className="flex items-center gap-2">
               <Image 
                 src="https://flagcdn.com/w40/us.png" 
                 alt="US" 
@@ -289,9 +273,9 @@ export default function Header() {
                 height={16}
                 className="rounded"
               />
-              <span  className="text-base font-semibold transition whitespace-nowrap">
+              <a href="tel:8775000282" className="text-base font-semibold hover:text-[#FF8C00] transition whitespace-nowrap">
                 (877) 500‑0282
-              </span>
+              </a>
 
               {/* Currency & Language Selector - Combined */}
               {/* <div className="relative hidden sm:block">

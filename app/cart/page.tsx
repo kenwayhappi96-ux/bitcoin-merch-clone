@@ -10,14 +10,22 @@ import { useState } from 'react'
 export default function CartPage() {
   const dispatch = useAppDispatch()
   const { items } = useAppSelector((state) => state.cart)
+
   const [shippingProtection, setShippingProtection] = useState(true)
   const [orderInstructions, setOrderInstructions] = useState('')
 
   const subtotal = items.reduce((sum, item) => sum + (item.discount_price || item.price) * item.quantity, 0)
   const originalTotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0)
   const saved = originalTotal - subtotal
-  const protectionFee = shippingProtection ? 1.50 : 0
+
+  // Protection à 13.50 (en € pour cohérence avec le reste)
+  const protectionFee = shippingProtection ? 13.50 : 0
   const total = subtotal + protectionFee
+
+  // Debug optionnel : voir les changements
+  // useEffect(() => {
+  //   console.log('Protection active:', shippingProtection, '→ Fee:', protectionFee, 'Total:', total)
+  // }, [shippingProtection, subtotal])
 
   return (
     <main className="min-h-screen bg-gray-50 py-12 px-4">
@@ -36,9 +44,8 @@ export default function CartPage() {
           </div>
         ) : (
           <div className="grid lg:grid-cols-3 gap-8">
-            {/* Cart Items */}
+            {/* Cart Items – inchangé */}
             <div className="lg:col-span-2 space-y-6">
-              {/* Table Header */}
               <div className="bg-white rounded-lg shadow-md overflow-hidden">
                 <div className="grid grid-cols-12 gap-4 p-4 bg-gray-100 font-semibold text-sm text-gray-700 border-b">
                   <div className="col-span-6">Product</div>
@@ -46,12 +53,13 @@ export default function CartPage() {
                   <div className="col-span-3 text-right">Total</div>
                 </div>
 
-                {/* Cart Items */}
                 {items.map((item) => {
                   const itemTotal = (item.discount_price || item.price) * item.quantity
                   return (
-                    <div key={item.id} className="grid grid-cols-12 gap-4 p-4 border-b last:border-b-0 items-center">
-                      {/* Product */}
+                    <div
+                      key={item.id}
+                      className="grid grid-cols-12 gap-4 p-4 border-b last:border-b-0 items-center"
+                    >
                       <div className="col-span-6 flex gap-4">
                         <Image
                           src={item.image || '/ref/logo.png'}
@@ -65,28 +73,37 @@ export default function CartPage() {
                           <div className="flex items-center gap-2 mt-1">
                             {item.discount_price ? (
                               <>
-                                <span className="text-[#3b82f6] font-bold">€{item.discount_price.toFixed(2)}</span>
-                                <span className="text-gray-500 line-through text-sm">€{item.price.toFixed(2)}</span>
+                                <span className="text-[#3b82f6] font-bold">
+                                  €{item.discount_price.toFixed(2)}
+                                </span>
+                                <span className="text-gray-500 line-through text-sm">
+                                  €{item.price.toFixed(2)}
+                                </span>
                               </>
                             ) : (
-                              <span className="text-gray-800 font-bold">€{item.price.toFixed(2)}</span>
+                              <span className="text-gray-800 font-bold">
+                                €{item.price.toFixed(2)}
+                              </span>
                             )}
                           </div>
                         </div>
                       </div>
 
-                      {/* Quantity */}
                       <div className="col-span-3">
                         <div className="flex items-center justify-center gap-2">
                           <button
-                            onClick={() => dispatch(updateQuantity({ id: item.id, quantity: Math.max(1, item.quantity - 1) }))}
+                            onClick={() =>
+                              dispatch(updateQuantity({ id: item.id, quantity: Math.max(1, item.quantity - 1) }))
+                            }
                             className="w-8 h-8 rounded border border-gray-300 flex items-center justify-center hover:bg-gray-100"
                           >
                             <Minus className="w-4 h-4" />
                           </button>
                           <span className="font-semibold w-8 text-center">{item.quantity}</span>
                           <button
-                            onClick={() => dispatch(updateQuantity({ id: item.id, quantity: item.quantity + 1 }))}
+                            onClick={() =>
+                              dispatch(updateQuantity({ id: item.id, quantity: item.quantity + 1 }))
+                            }
                             className="w-8 h-8 rounded border border-gray-300 flex items-center justify-center hover:bg-gray-100"
                           >
                             <Plus className="w-4 h-4" />
@@ -101,7 +118,6 @@ export default function CartPage() {
                         </button>
                       </div>
 
-                      {/* Total */}
                       <div className="col-span-3 text-right font-bold text-gray-800">
                         €{itemTotal.toFixed(2)}
                       </div>
@@ -111,7 +127,7 @@ export default function CartPage() {
               </div>
             </div>
 
-            {/* Order Summary */}
+            {/* Order Summary – partie modifiée */}
             <div className="lg:col-span-1">
               <div className="bg-white rounded-lg shadow-md p-6 space-y-6 sticky top-4">
                 <h2 className="text-xl font-bold text-gray-800">Order Summary</h2>
@@ -139,7 +155,7 @@ export default function CartPage() {
                   )}
                 </div>
 
-                {/* Order Instructions */}
+                {/* Order instructions */}
                 <div>
                   <div className="flex justify-between items-center mb-2">
                     <h3 className="font-semibold text-gray-700">Order instructions</h3>
@@ -158,7 +174,7 @@ export default function CartPage() {
                   Taxes and shipping calculated at checkout
                 </p>
 
-                {/* Shipping Protection */}
+                {/* Navidium Shipping Protection – texte exact demandé */}
                 <div className="border-t pt-4">
                   <label className="flex items-start gap-3 cursor-pointer">
                     <input
@@ -169,19 +185,26 @@ export default function CartPage() {
                     />
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-1">
-                        <span className="text-xs bg-blue-100 text-blue-600 px-2 py-0.5 rounded font-semibold">Navidium</span>
+                        <span className="text-xs bg-blue-100 text-blue-600 px-2 py-0.5 rounded font-semibold">
+                          Navidium
+                        </span>
                         <span className="font-semibold text-sm">Shipping Protection</span>
                       </div>
-                      <p className="text-xs text-gray-600">from Damage, Loss & Theft for $1.50</p>
-                      <p className="text-xs text-red-600 mt-1 italic">
-                        By Deselecting Shipping Protection, we will not be liable for lost or stolen packages.
+                      <p className="text-xs text-gray-600">
+                        from Damage, Loss & Theft for $13.50
+                      </p>
+                      <p className="text-xs text-gray-700 mt-1">
+                        Get peace of mind with Delivery Guarantee in the event your delivery is damaged, stolen, or lost during transit.
                       </p>
                     </div>
                   </label>
                 </div>
 
                 {/* Checkout Button */}
-                <Link href="/checkout" className="block w-full bg-[#3b82f6] text-white py-3 rounded-lg font-semibold hover:bg-[#2563eb] transition text-center">
+                <Link
+                  href="/checkout"
+                  className="block w-full bg-[#3b82f6] text-white py-3 rounded-lg font-semibold hover:bg-[#2563eb] transition text-center"
+                >
                   Checkout
                 </Link>
               </div>

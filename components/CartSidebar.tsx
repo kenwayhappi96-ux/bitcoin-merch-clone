@@ -5,16 +5,12 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { useAppDispatch, useAppSelector } from '@/store/hooks'
 import { closeCart, removeFromCart, updateQuantity } from '@/store/cartSlice'
-import { useState } from 'react'
 
 export default function CartSidebar() {
   const dispatch = useAppDispatch()
   const { items, isOpen } = useAppSelector((state) => state.cart)
-  const [shippingProtection, setShippingProtection] = useState(true)
 
   const subtotal = items.reduce((sum, item) => sum + (item.discount_price || item.price) * item.quantity, 0)
-  const protectionFee = shippingProtection ? 1.50 : 0
-  const total = subtotal + protectionFee
 
   if (!isOpen) return null
 
@@ -28,7 +24,7 @@ export default function CartSidebar() {
 
       {/* Sidebar */}
       <div className="fixed top-0 right-0 h-full w-full max-w-md bg-white shadow-2xl z-50 flex flex-col">
-        {/* Header - Fixe en haut */}
+        {/* Header */}
         <div className="flex items-center justify-between p-6 border-b bg-white flex-shrink-0">
           <h2 className="text-xl font-bold text-black inline-flex gap-3 items-center">
             Cart 
@@ -42,7 +38,7 @@ export default function CartSidebar() {
           </button>
         </div>
 
-        {/* Zone scrollable - UNIQUEMENT les produits */}
+        {/* Zone scrollable - produits */}
         <div className="flex-1 overflow-y-auto">
           <div className="p-6">
             {items.length === 0 ? (
@@ -115,42 +111,15 @@ export default function CartSidebar() {
           </div>
         </div>
 
-        {/* Footer - TOUJOURS VISIBLE EN BAS (Shipping Protection + Totaux + Boutons) */}
+        {/* Footer - toujours visible quand il y a des produits */}
         {items.length > 0 && (
           <div className="border-t bg-white flex-shrink-0">
-            {/* Shipping Protection */}
-            <div className="px-6 pt-4 pb-3 border-b border-gray-100">
-              <label className="flex items-start gap-3 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={shippingProtection}
-                  onChange={(e) => setShippingProtection(e.target.checked)}
-                  className="mt-1 w-5 h-5 text-[#3b82f6] rounded focus:ring-2 focus:ring-blue-500"
-                />
-                <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className="text-xs bg-blue-100 text-blue-600 px-2 py-0.5 rounded font-semibold">
-                      Navidium
-                    </span>
-                    <span className="font-semibold text-sm">Shipping Protection</span>
-                  </div>
-                  <p className="text-xs text-gray-600">
-                    from Damage, Loss & Theft for $1.50
-                  </p>
-                  <p className="text-xs text-red-600 mt-1 italic">
-                    By Deselecting Shipping Protection, we will not be liable for lost or stolen packages.
-                  </p>
-                </div>
-              </label>
-            </div>
-
-            {/* Totaux et Boutons */}
             <div className="p-6 space-y-4">
               <div className="flex justify-between items-center">
                 <span className="font-semibold text-base">
                   Subtotal ({items.reduce((sum, item) => sum + item.quantity, 0)} item{items.reduce((sum, item) => sum + item.quantity, 0) > 1 ? 's' : ''})
                 </span>
-                <span className="font-bold text-xl">${total.toFixed(2)}</span>
+                <span className="font-bold text-xl">${subtotal.toFixed(2)}</span>
               </div>
               
               <Link

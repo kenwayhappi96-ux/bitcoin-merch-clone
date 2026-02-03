@@ -194,7 +194,7 @@ export default function Header() {
               <Link href="/reviews" className="text-base font-semibold hover:text-[#FF8C00] transition py-2">
                 Reviews
               </Link>
-              <Link href="/pool" className="py-3 border-b border-white/10 text-sm font-medium hover:text-[#f18a1d] transition">
+              <Link href="https://pool.bitcoinmerch.com/" target="_blank" rel="noopener noreferrer"  className="py-3 border-b border-white/10 text-sm font-medium hover:text-[#f18a1d] transition">
                 Pool
               </Link>
               <Link href="/support" className="py-3 border-b border-white/10 text-sm font-medium hover:text-[#f18a1d] transition">
@@ -255,7 +255,7 @@ export default function Header() {
                 <Star className="w-5 h-5 flex-shrink-0" />
                 Avis
               </Link>
-              <Link href="/pool" className="flex items-center gap-1.5 text-base font-semibold hover:text-[#FF8C00] transition whitespace-nowrap">
+              <Link href="https://pool.bitcoinmerch.com/" target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 text-base font-semibold hover:text-[#FF8C00] transition whitespace-nowrap">
                 <Droplets className="w-5 h-5 flex-shrink-0" />
                 Piscine
               </Link>

@@ -1,131 +1,233 @@
-import { Video, Play, Clock } from 'lucide-react'
+'use client'
+
 import Image from 'next/image'
+import Link from 'next/link'
+import { useState } from 'react'
+import Pagination from '@/components/Pagination'
 
 const videoGuides = [
+  // Page 1
   {
     id: 1,
-    title: 'Setting Up Your Lucky Miner - Complete Guide',
-    description: 'Learn how to unbox, connect, and configure your Lucky Miner for solo Bitcoin mining.',
-    duration: '12:45',
-    thumbnail: 'https://via.placeholder.com/640x360/3b82f6/ffffff?text=Lucky+Miner+Setup',
-    category: 'Getting Started'
+    title: 'How To Set Up Your X Node Mini',
+    date: '2025-11-05',
+    description: '🧠 X Node Mini — Setup Guide Your personal Bitcoin Full Node, powered by UmbrelBuilt for privacy, sovereignty, and the true Bitcoin experience. 📦 W...',
+    link: 'https://bitcoinmerch.com/en-eu/blogs/guides/how-to-set-up-your-x-node-mini',
+    thumbnail: 'https://bitcoinmerch.com/cdn/shop/articles/Zyber_8S_Thumbnail_600x.png?v=1758673066',
   },
   {
     id: 2,
-    title: 'Bitaxe Configuration Tutorial',
-    description: 'Step-by-step guide to setting up WiFi, connecting to pools, and monitoring your Bitaxe miner.',
-    duration: '18:30',
-    thumbnail: 'https://via.placeholder.com/640x360/ef4444/ffffff?text=Bitaxe+Config',
-    category: 'Setup'
+    title: 'Set Up Guide For The Gold Digger Nerd Miner',
+    date: '2025-10-14',
+    description: 'Bitcoin Merch® - Gold Digger Lottery NMMiner 1000KH/s Power the Gold Digger: Plug your Gold Nugget into a USB power brick or power source usin...',
+    link: 'https://bitcoinmerch.com/en-eu/blogs/guides/set-up-guide-for-the-gold-digger-nerd-miner',
+    thumbnail: 'https://bitcoinmerch.com/cdn/shop/articles/Golden_Nugget_Thumbnail_b52578f7-943e-4e20-84ba-19251d880827_600x.png?v=1761325510',
   },
   {
     id: 3,
-    title: 'Understanding Bitcoin Mining Pools',
-    description: 'Learn the difference between pool mining and solo mining, and which is right for you.',
-    duration: '9:15',
-    thumbnail: 'https://via.placeholder.com/640x360/10b981/ffffff?text=Mining+Pools',
-    category: 'Education'
+    title: 'Setting Up The Zyber 8S & 8G',
+    date: '2025-07-07',
+    description: 'Here is the quick review and set-up video: As a first-time user, we understand that you might have some questions and concerns about how to proper...',
+    link: 'https://bitcoinmerch.com/en-eu/blogs/guides/setting-up-the-zyber-8s',
+    thumbnail: 'https://bitcoinmerch.com/cdn/shop/articles/SupraHex_Thumbnail_600x.png?v=1767046538',
   },
   {
     id: 4,
-    title: 'Optimizing Your Mining Setup for Maximum Efficiency',
-    description: 'Tips and tricks to reduce power consumption and increase hashrate performance.',
-    duration: '15:20',
-    thumbnail: 'https://via.placeholder.com/640x360/FF8C00/ffffff?text=Optimization',
-    category: 'Advanced'
+    title: 'Set Up Guide For The Gold Nugget Nerd Miner',
+    date: '2025-06-27',
+    description: 'Here is the quick review and set-up video: Bitcoin Merch® - Gold Nugget Lottery Nerd Miner NMMiner 350 KH/s Power the Gold Nugget: Plug your Go...',
+    link: 'https://bitcoinmerch.com/en-eu/blogs/guides/set-up-guide-for-the-gold-nugget-nerd-miner',
+    thumbnail: 'https://bitcoinmerch.com/cdn/shop/articles/NerdQaxe_Thumbnail_13f26452-cdd0-4c30-b718-0cf09977fa6b_600x.png?v=1767123289',
   },
   {
     id: 5,
-    title: 'Cooling Solutions for Home Mining',
-    description: 'Best practices for keeping your miners cool and running efficiently.',
-    duration: '10:55',
-    thumbnail: 'https://via.placeholder.com/640x360/06b6d4/ffffff?text=Cooling',
-    category: 'Maintenance'
+    title: 'Set Up Guide For The Bitaxe SupraHex',
+    date: '2025-06-27',
+    description: 'Here is the quick review and set-up video: The Bitaxe SupraHex 701 4.2TH/s is a powerful, open-source Bitcoin solo home miner featuring 6 BM1368 AS...',
+    link: 'https://bitcoinmerch.com/en-eu/blogs/guides/set-up-guide-for-the-bitaxe-suprahex',
+    thumbnail: 'https://bitcoinmerch.com/cdn/shop/articles/Zyber_8S_Thumbnail_600x.png?v=1758673066',
   },
   {
     id: 6,
-    title: 'Troubleshooting Common Mining Issues',
-    description: 'How to diagnose and fix the most common problems miners face.',
-    duration: '14:40',
-    thumbnail: 'https://via.placeholder.com/640x360/8b5cf6/ffffff?text=Troubleshooting',
-    category: 'Support'
-  }
-]
+    title: 'Set Up Guide For The NerdQaxe++',
+    date: '2025-06-09',
+    description: 'Here is the quick review and set-up video: Just got your hands on the NerdQaxe++? Congrats! 🎉 You\'re now the proud owner of one of the most effici...',
+    link: 'https://bitcoinmerch.com/en-eu/blogs/guides/set-up-guide-for-the-nerdqaxe',
+    thumbnail: 'https://bitcoinmerch.com/cdn/shop/articles/Golden_Nugget_Thumbnail_b52578f7-943e-4e20-84ba-19251d880827_600x.png?v=1761325510',
+  },
+
+  // Page 2
+  {
+    id: 7,
+    title: 'How to Set Up The Disruptor USB Solo Miner 300GH/s+',
+    date: '2025-05-01',
+    description: 'Here is the quick review and set-up video: Welcome to the future of Bitcoin mining! The Disruptor USB Solo Bitcoin Miner is designed to get you min...',
+    link: 'https://bitcoinmerch.com/en-eu/blogs/guides/how-to-set-up-the-disruptor-usb-solo-miner-300gh-s-1',
+    thumbnail: 'https://bitcoinmerch.com/cdn/shop/articles/Disruptor_Thumbnail_f53b5a80-0c27-46d9-8b50-fae76c300dfa_600x.png?v=1762535912',
+  },
+  {
+    id: 8,
+    title: 'How to Set Up Your Mein Coffee Silent USB-C Bitcoin Miner (600 GH/s)',
+    date: '2025-04-29',
+    description: 'Here is the quick review and set-up video: Welcome to your new favorite part of the morning: sipping coffee while mining Bitcoin silently from your...',
+    link: 'https://bitcoinmerch.com/en-eu/blogs/guides/how-to-set-up-your-mein-coffee-silent-usb-c-bitcoin-miner-600-gh-s-8',
+    thumbnail: 'https://bitcoinmerch.com/cdn/shop/articles/MeinCoffee_Thumbnail_600x.jpg?v=1746034223',
+  },
+  {
+    id: 9,
+    title: 'Set Up Guide For The Bitaxe HEX',
+    date: '2025-03-07',
+    description: 'Here is the quick review and set-up video: Are you ready to elevate your Bitcoin mining experience with the revolutionary Bitaxe Hex? This powerful...',
+    link: 'https://bitcoinmerch.com/en-eu/blogs/guides/set-up-guide-for-the-bitaxe-hex',
+    thumbnail: 'https://bitcoinmerch.com/cdn/shop/articles/HEX_Final_Stock_Image_600x.jpg?v=1741625284',
+  },
+  {
+    id: 10,
+    title: 'In Depth Set Up Guide For The Canaan Avalon Nano 3S',
+    date: '2025-03-05',
+    description: 'Welcome to our guide on unboxing and setting up the Avalon Nano 3S, a powerful and efficient Bitcoin miner. Whether you\'re new to cryptocurrency mi...',
+    link: 'https://bitcoinmerch.com/en-eu/blogs/guides/in-depth-set-up-guide-for-the-canaan-avalon-nano-3s',
+    thumbnail: 'https://bitcoinmerch.com/cdn/shop/articles/Avalaon_nano_3s_final_thumbnail_0fc7bad4-addc-4767-b713-98dedef1eb26_600x.jpg?v=1754509703',
+  },
+  {
+    id: 11,
+    title: 'Set Up Guide for the Canaan Avalon Mini 3',
+    date: '2025-02-28',
+    description: 'Here is the quick review and set-up video: Welcome to your new Canaan Avalon Mini 3, the innovative device that warms your home while mining Bitco...',
+    link: 'https://bitcoinmerch.com/en-eu/blogs/guides/set-up-guide-for-the-canaan-avalon-mini-3',
+    thumbnail: 'https://bitcoinmerch.com/cdn/shop/articles/Avalon_Mini_3_Thumbnail_Pic_78df81c8-b64c-4668-89bb-eabb88391872_600x.jpg?v=1741211447',
+  },
+
+  // Page 3
+  {
+    id: 12,
+    title: 'Which Coins Can You Mine in 2025? Top Options for Profit in the Crypto Market',
+    date: '2024-12-31',
+    description: 'As we move into 2025, cryptocurrency mining remains a lucrative opportunity, especially for Proof of Work (PoW) coins. These coins rely on miners t...',
+    link: 'https://bitcoinmerch.com/en-eu/blogs/guides/which-coins-can-you-mine-in-2025-top-options-for-profit-in-the-crypto-market',
+    thumbnail: 'https://bitcoinmerch.com/cdn/shop/articles/Bitcoin_Merch_BITCOIN_WITH_BITCOIN_MINER_MACHINE_WITH_MONEY_f9d6b679-7112-46c7-857f-106202216ee9_600x.jpg?v=1735678846',
+  },
+  {
+    id: 13,
+    title: 'Master the Bitaxe Gamma: Your Complete Guide to Efficient and Effective Bitcoin Mining',
+    date: '2024-10-09',
+    description: 'Here is the quick review and set-up video:This guide walks you through each step to get your mining rig up and running quickly and effectively.',
+    link: 'https://bitcoinmerch.com/en-eu/blogs/guides/master-the-bitaxe-gamma-your-complete-guide-to-efficient-and-effective-bitcoin-mining',
+    thumbnail: 'https://bitcoinmerch.com/cdn/shop/articles/attractive_1_7001a188-3135-411f-9eb5-639219dafc0b_600x.jpg?v=1765228217',
+  },
+  {
+    id: 14,
+    title: 'Bank of America Outage: Why Cryptocurrency Payments with Bitcoin Merch Offer Stability and Control',
+    date: '2024-10-02',
+    description: 'Bank of America Outage: Why Cryptocurrency Payments with Bitcoin Merch Offer Stability and Control On what seems to be a disruptive day for million...',
+    link: 'https://bitcoinmerch.com/en-eu/blogs/guides/bank-of-america-outage-why-cryptocurrency-payments-with-bitcoin-merch-offer-stability-and-control',
+    thumbnail: 'https://bitcoinmerch.com/cdn/shop/articles/0317efff-5557-4956-8cf4-3e85b250aa9c_600x.webp?v=1727894780',
+  },
+  {
+    id: 15,
+    title: 'How to Set Up the $25 USB Nerd Miner',
+    date: '2024-09-12',
+    description: 'Bitcoin Merch® NerdMiner 2 - USB Solo Bitcoin Miner with WiFi Connect the USB Nerd Miner: Plug your Nerd Miner into a USB port on your computer...',
+    link: 'https://bitcoinmerch.com/en-eu/blogs/guides/how-to-set-up-the-25-usb-nerd-miner',
+    thumbnail: 'https://bitcoinmerch.com/cdn/shop/articles/thumbnail_5dd5ccf5-b652-42b3-88d3-47bc57c4e9b2_600x.jpg?v=1761263224',
+  },
+  {
+    id: 16,
+    title: 'How to Set Up the Canan Avalon Nano 3',
+    date: '2024-08-13',
+    description: 'Buy The Avalon Nano 3 Bitcoin Miner 4 TH/s + Power Supply 1. Unboxing and Initial Setup: Power Connection: Plug the power supply into an outlet....',
+    link: 'https://bitcoinmerch.com/en-eu/blogs/guides/how-to-set-up-the-canan-avalon-nano-3',
+    thumbnail: 'https://bitcoinmerch.com/cdn/shop/articles/Screenshot_2024-08-13_164033_600x.png?v=1723592533',
+  },
+  {
+    id: 17,
+    title: 'Major Mining Milestone: A Customer Hits the Block with Bitaxe Supra!',
+    date: '2024-07-24',
+    description: 'We’re thrilled to share an exciting update from our mining operations here at BitcoinMerch.com! One of our valued Bitaxe Supra customers has just h...',
+    link: 'https://bitcoinmerch.com/en-eu/blogs/guides/%F0%9F%8E%89-major-mining-milestone-a-customer-hits-the-block-with-bitaxe-supra-%F0%9F%9A%80',
+    thumbnail: 'https://bitcoinmerch.com/cdn/shop/articles/Untitled_design_600x.png?v=1721860294',
+  },
+
+  // Tu peux ajouter les pages 4 à 10 de la même façon (visite-les une par une et copie les infos)
+  // Pour les anciennes pages, beaucoup n'ont pas de thumbnail ou pas de vidéo → tu peux laisser thumbnail vide ou utiliser un placeholder
+] as const
+
+const ITEMS_PER_PAGE = 4
 
 export default function VideoGuidesPage() {
+  const [currentPage, setCurrentPage] = useState(1)
+
+  const totalPages = Math.ceil(videoGuides.length / ITEMS_PER_PAGE)
+  const paginatedVideos = videoGuides.slice(
+    (currentPage - 1) * ITEMS_PER_PAGE,
+    currentPage * ITEMS_PER_PAGE
+  )
+
   return (
-    <main className="min-h-screen bg-gray-50">
-      <div className="bg-gradient-to-r from-[#3b82f6] to-[#2563eb] text-white py-16 px-4">
-        <div className="max-w-6xl mx-auto">
-          <div className="flex items-center gap-3 mb-4">
-            <Video className="w-12 h-12" />
-            <h1 className="text-4xl md:text-5xl font-bold">Video Guides</h1>
-          </div>
-          <p className="text-xl text-blue-100 max-w-3xl">
-            Learn everything about Bitcoin mining with our comprehensive video tutorials. 
-            From beginner basics to advanced optimization techniques.
-          </p>
-        </div>
-      </div>
+    <main className="min-h-screen bg-white py-12 px-6 sm:px-10 w-full overflow-hidden">
+      <div className="flex flex-col gap-8 max-w-6xl mx-auto">
+        <span className="text-3xl md:text-4xl font-bold text-black review">
+          Guides
+        </span>
 
-      <section className="py-12 px-4">
-        <div className="max-w-6xl mx-auto">
-          <div className="mb-8">
-            <h2 className="text-2xl font-bold text-gray-800 mb-4">Browse by Category</h2>
-            <div className="flex flex-wrap gap-3">
-              {['All', 'Getting Started', 'Setup', 'Education', 'Advanced', 'Maintenance', 'Support'].map((category) => (
-                <button
-                  key={category}
-                  className="px-4 py-2 rounded-full bg-white text-gray-700 font-semibold hover:bg-[#3b82f6] hover:text-white transition shadow-sm"
-                >
-                  {category}
-                </button>
-              ))}
-            </div>
-          </div>
+        <div className="flex flex-col gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            {paginatedVideos.map((video) => (
+              <Link
+                href={video.link}
+                target="_blank"
+                rel="noopener noreferrer"
+                key={video.id}
+                className="bg-white overflow-hidden cursor-pointer review group border border-gray-200 hover:border-[#fd9619]/50 transition-all duration-200"
+              >
+                <div className="p-4 mb-3">
+                  <div className="flex flex-col gap-1 mb-3">
+                    <h3 className="text-lg font-bold text-gray-800 line-clamp-2 group-hover:text-[#fd9619] transition-colors">
+                      {video.title}
+                    </h3>
+                    <span className="text-xs text-gray-600">
+                      {new Date(video.date).toLocaleDateString('en-US', {
+                        month: 'short',
+                        day: 'numeric',
+                        year: 'numeric',
+                      })}
+                    </span>
+                  </div>
+                  <p className="text-gray-600 text-sm line-clamp-3">
+                    {video.description}
+                  </p>
+                </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {videoGuides.map((video) => (
-              <div key={video.id} className="bg-white rounded-lg shadow-md hover:shadow-xl transition overflow-hidden group cursor-pointer">
-                <div className="relative aspect-video">
-                  <Image
-                    src={video.thumbnail}
-                    alt={video.title}
-                    fill
-                    className="object-cover group-hover:scale-105 transition-transform duration-300"
-                  />
-                  <div className="absolute inset-0 bg-black/40 flex items-center justify-center group-hover:bg-black/60 transition">
-                    <div className="bg-white/90 rounded-full p-4 group-hover:scale-110 transition">
-                      <Play className="w-8 h-8 text-[#3b82f6]" />
-                    </div>
+                {video.thumbnail ? (
+                  <div className="relative aspect-video overflow-hidden bg-gray-50">
+                    <Image
+                      src={video.thumbnail}
+                      alt={video.title}
+                      fill
+                      className="object-cover group-hover:scale-105 transition-transform duration-300"
+                      sizes="(max-width: 640px) 100vw, 50vw"
+                    />
                   </div>
-                  <div className="absolute bottom-2 right-2 bg-black/80 text-white px-2 py-1 rounded text-sm flex items-center gap-1">
-                    <Clock className="w-3 h-3" />
-                    {video.duration}
+                ) : (
+                  <div className="relative aspect-video bg-gray-200 flex items-center justify-center text-gray-500 text-sm">
+                    No preview
                   </div>
-                </div>
-                <div className="p-4">
-                  <div className="text-xs font-semibold text-[#3b82f6] mb-2">{video.category}</div>
-                  <h3 className="text-lg font-bold text-gray-800 mb-2 line-clamp-2">{video.title}</h3>
-                  <p className="text-gray-600 text-sm line-clamp-2">{video.description}</p>
-                </div>
-              </div>
+                )}
+              </Link>
             ))}
           </div>
-        </div>
-      </section>
 
-      <section className="py-16 px-4 bg-white">
-        <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-3xl font-bold text-gray-800 mb-4">Need Personalized Help?</h2>
-          <p className="text-lg text-gray-600 mb-8">
-            Battle Pass members get exclusive access to live 1-on-1 video support sessions
-          </p>
-          <button className="bg-[#FF8C00] text-white px-8 py-4 rounded-lg text-lg font-bold hover:bg-[#ff9d1f] transition">
-            Upgrade to Battle Pass
-          </button>
+          {totalPages > 1 && (
+            <div className="mt-10 flex justify-center">
+              <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={setCurrentPage}
+              />
+            </div>
+          )}
         </div>
-      </section>
+      </div>
     </main>
   )
 }

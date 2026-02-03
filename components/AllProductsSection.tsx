@@ -61,7 +61,7 @@ export default function AllProductsSection({ initialProducts }: AllProductsSecti
 
   return (
     <section className="py-16 px-4 bg-gray-50">
-      <div className="max-w-7xl mx-auto">
+      <div className="max-w-7xl mx-auto text-center">
         <div className="flex items-center justify-between mb-8">
           <h2 className="text-3xl md:text-4xl font-bold text-gray-800">Produits vedette</h2>
         </div>

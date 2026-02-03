@@ -4,11 +4,15 @@ import type { CartItem, Product } from '@/types'
 interface CartState {
   items: CartItem[]
   isOpen: boolean
+  shippingProtection: boolean          // ← NOUVEAU
+  protectionFee: number                // ← NOUVEAU (13.50 par défaut)
 }
 
 const initialState: CartState = {
   items: [],
   isOpen: false,
+  shippingProtection: true,            // coché par défaut
+  protectionFee: 13.50,                // montant fixe (en € ou $ selon ta préférence)
 }
 
 const cartSlice = createSlice({
@@ -58,6 +62,17 @@ const cartSlice = createSlice({
     closeCart: (state) => {
       state.isOpen = false
     },
+
+    // ──────────────────────────────────────────────
+    // NOUVEAUX REDUCERS pour la protection
+    // ──────────────────────────────────────────────
+    setShippingProtection: (state, action: PayloadAction<boolean>) => {
+      state.shippingProtection = action.payload
+    },
+
+    toggleShippingProtection: (state) => {
+      state.shippingProtection = !state.shippingProtection
+    },
   },
 })
 
@@ -68,7 +83,9 @@ export const {
   clearCart, 
   toggleCart,
   openCart,
-  closeCart 
+  closeCart,
+  setShippingProtection,
+  toggleShippingProtection,
 } = cartSlice.actions
 
 export default cartSlice.reducer

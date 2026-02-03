@@ -1,37 +1,146 @@
 'use client'
 
-import { ShoppingCart, User, ChevronDown, Search, Menu, X, Pickaxe, Box, Trophy, Video, Star, Droplets, Headphones, Phone, Mail, Facebook, Twitter, Instagram, Youtube } from 'lucide-react'
+import { ShoppingCart, User, ChevronDown, Search, Menu, X, Trophy, Video, Star, Droplets, Headphones, Phone, Mail, Box } from 'lucide-react'
 import Link from 'next/link'
 import Image from 'next/image'
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useAppDispatch, useAppSelector } from '@/store/hooks'
 import { openCart } from '@/store/cartSlice'
+import { useRouter } from 'next/navigation'
+
+interface SearchResult {
+  id: number
+  name: string
+  slug: string
+  price: string | number
+  discount_price: string | number | null
+  category_name: string
+  image: string | null
+}
 
 export default function Header() {
   const dispatch = useAppDispatch()
+  const router = useRouter()
   const cartItems = useAppSelector((state) => state.cart.items)
   const [accountDropdown, setAccountDropdown] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
+  const [searchResults, setSearchResults] = useState<SearchResult[]>([])
+  const [showResults, setShowResults] = useState(false)
   const [isSearching, setIsSearching] = useState(false)
   const [showMobileSearch, setShowMobileSearch] = useState(false)
-  const [currency, setCurrency] = useState('EUR')
-  const [language, setLanguage] = useState('English')
   const [settingsDropdown, setSettingsDropdown] = useState(false)
+  const [selectedIndex, setSelectedIndex] = useState(-1)
+  
+  const searchRef = useRef<HTMLDivElement>(null)
+  const mobileSearchRef = useRef<HTMLDivElement>(null)
+  const inputRef = useRef<HTMLInputElement>(null)
 
   const cartCount = cartItems.reduce((sum, item) => sum + item.quantity, 0)
+
+  // Recherche en temps réel
+  useEffect(() => {
+    const delaySearch = setTimeout(async () => {
+      if (searchQuery.trim().length > 0) {
+        setIsSearching(true)
+        try {
+          const response = await fetch(`/api/search?q=${encodeURIComponent(searchQuery)}`)
+          const data = await response.json()
+          setSearchResults(data)
+          setShowResults(true)
+          setSelectedIndex(-1)
+        } catch (error) {
+          console.error('Search error:', error)
+          setSearchResults([])
+        } finally {
+          setIsSearching(false)
+        }
+      } else {
+        setSearchResults([])
+        setShowResults(false)
+      }
+    }, 300)
+
+    return () => clearTimeout(delaySearch)
+  }, [searchQuery])
+
+  // Fermer les résultats au clic extérieur
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
+        setShowResults(false)
+      }
+      if (mobileSearchRef.current && !mobileSearchRef.current.contains(event.target as Node)) {
+        setShowResults(false)
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
+
+  // Navigation au clavier
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (!showResults || searchResults.length === 0) return
+
+    if (e.key === 'ArrowDown') {
+      e.preventDefault()
+      setSelectedIndex(prev => (prev < searchResults.length - 1 ? prev + 1 : prev))
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault()
+      setSelectedIndex(prev => (prev > 0 ? prev - 1 : -1))
+    } else if (e.key === 'Enter') {
+      e.preventDefault()
+      if (selectedIndex >= 0 && searchResults[selectedIndex]) {
+        navigateToProduct(searchResults[selectedIndex])
+      } else if (searchQuery.trim()) {
+        navigateToSearchPage()
+      }
+    } else if (e.key === 'Escape') {
+      setShowResults(false)
+      setSelectedIndex(-1)
+    }
+  }
+
+  const navigateToProduct = (product: SearchResult) => {
+    router.push(`/products/${product.slug}`)
+    setSearchQuery('')
+    setShowResults(false)
+    setShowMobileSearch(false)
+    setSelectedIndex(-1)
+  }
+
+  const navigateToSearchPage = () => {
+    router.push(`/search?q=${encodeURIComponent(searchQuery)}`)
+    setShowResults(false)
+    setShowMobileSearch(false)
+  }
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault()
     if (searchQuery.trim()) {
-      setIsSearching(true)
-      setTimeout(() => setIsSearching(false), 1000)
+      navigateToSearchPage()
     }
+  }
+
+  const formatPrice = (price: string | number, discountPrice: string | number | null) => {
+    const priceNum = typeof price === 'string' ? parseFloat(price) : price
+    const discountNum = discountPrice ? (typeof discountPrice === 'string' ? parseFloat(discountPrice) : discountPrice) : null
+
+    if (discountNum && discountNum < priceNum) {
+      return (
+        <div className="flex items-center gap-2">
+          <span className="text-red-600 font-bold">€{discountNum.toFixed(2)}</span>
+          <span className="text-gray-400 line-through text-sm">€{priceNum.toFixed(2)}</span>
+        </div>
+      )
+    }
+    return <span className="font-bold">€{priceNum.toFixed(2)}</span>
   }
 
   return (
     <>
-      {/* Top Section - Sticky (reste visible) */}
+      {/* Top Section - Sticky */}
       <div className="sticky top-0 z-50 bg-[#0036cc] text-white shadow-lg border-b border-white/20">
         <div className="w-full max-w-[90%] mx-auto px-5 py-4">
           <div className="flex items-center justify-between gap-4">
@@ -42,7 +151,6 @@ export default function Header() {
               
               <Link href="/" className="flex-shrink-0">
                 <Image 
-                  //src="/ref/logo.png" 
                   src="https://cdn.shopify.com/s/files/1/2609/9556/files/bitcoin-merch-logoeu_150x@2x.png?v=1767374567" 
                   alt="Bitcoin Merch" 
                   width={200}
@@ -52,26 +160,98 @@ export default function Header() {
               </Link>
             </div>
 
-            <form
-              onSubmit={handleSearch}
-              className="flex-1 hidden md:block"
-            >
-              <div className="relative">
-                <input
-                  type="text"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Search..."
-                  className="w-full pl-5 pr-16 py-3 bg-white text-black rounded-md focus:ring-2 focus:ring-[#FF8C00]"
-                />
-                <button
-                  type="submit"
-                  className="absolute right-0 top-0 h-full px-4 bg-[#FF8C00] rounded-r-md flex items-center justify-center"
-                >
-                  <Search className="w-5 h-5 text-white" />
-                </button>
-              </div>
-            </form>
+            {/* Desktop Search */}
+            <div className="flex-1 hidden md:block relative" ref={searchRef}>
+              <form onSubmit={handleSearch}>
+                <div className="relative">
+                  <input
+                    ref={inputRef}
+                    type="text"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    onKeyDown={handleKeyDown}
+                    onFocus={() => searchResults.length > 0 && setShowResults(true)}
+                    placeholder="Rechercher des produits..."
+                    className="w-full pl-5 pr-16 py-3 bg-white text-black rounded-md focus:ring-2 focus:ring-[#FF8C00] focus:outline-none"
+                  />
+                  <button
+                    type="submit"
+                    className="absolute right-0 top-0 h-full px-4 bg-[#FF8C00] rounded-r-md flex items-center justify-center hover:bg-[#e67e00] transition"
+                  >
+                    {isSearching ? (
+                      <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    ) : (
+                      <Search className="w-5 h-5 text-white" />
+                    )}
+                  </button>
+                </div>
+              </form>
+
+              {/* Desktop Search Results */}
+              {showResults && searchResults.length > 0 && (
+                <div className="absolute top-full left-0 right-0 mt-2 bg-white text-gray-800 rounded-lg shadow-2xl max-h-[500px] overflow-y-auto z-50">
+                  {searchResults.map((product, index) => (
+                    <button
+                      key={product.id}
+                      onClick={() => navigateToProduct(product)}
+                      className={`w-full flex items-center gap-4 p-4 hover:bg-gray-50 transition border-b border-gray-100 last:border-b-0 text-left ${
+                        selectedIndex === index ? 'bg-blue-50' : ''
+                      }`}
+                    >
+                      <div className="w-16 h-16 flex-shrink-0 bg-gray-100 rounded overflow-hidden">
+                        {product.image ? (
+                          <Image
+                            src={product.image}
+                            alt={product.name}
+                            width={64}
+                            height={64}
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center text-gray-400">
+                            <Box className="w-8 h-8" />
+                          </div>
+                        )}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <h4 className="font-semibold text-sm line-clamp-2 mb-1">{product.name}</h4>
+                        <p className="text-xs text-gray-500 mb-1">{product.category_name}</p>
+                        <div className="text-sm">
+                          {formatPrice(product.price, product.discount_price)}
+                        </div>
+                      </div>
+                    </button>
+                  ))}
+                  
+                  {searchQuery.trim() && (
+                    <button
+                      onClick={navigateToSearchPage}
+                      className="w-full p-4 text-center text-[#0036cc] hover:bg-gray-50 font-semibold text-sm border-t-2 border-gray-200"
+                    >
+                      Voir tous les résultats pour "{searchQuery}"
+                    </button>
+                  )}
+                </div>
+              )}
+
+              {/* No Results Message */}
+              {showResults && searchResults.length === 0 && searchQuery.trim() && !isSearching && (
+                <div className="absolute top-full left-0 right-0 mt-2 bg-white text-gray-800 rounded-lg shadow-2xl p-6 text-center z-50">
+                  <Search className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+                  <h3 className="font-bold text-lg mb-2">Aucun résultat trouvé</h3>
+                  <p className="text-gray-600 mb-4">
+                    Aucun résultat pour &quot;{searchQuery}&quot;
+                  </p>
+                  <Link
+                    href="/"
+                    className="text-[#0036cc] hover:text-[#FF8C00] font-semibold"
+                    onClick={() => setShowResults(false)}
+                  >
+                    Retour à l&apos;accueil
+                  </Link>
+                </div>
+              )}
+            </div>
 
             <div className="flex items-center gap-4">
               <button onClick={() => setShowMobileSearch(!showMobileSearch)} className="md:hidden hover:text-[#FF8C00] transition">
@@ -121,7 +301,7 @@ export default function Header() {
                 </button>
 
                 {accountDropdown && (
-                  <div className="absolute right-0 mt-2 w-64 bg-white text-gray-800 rounded-lg shadow-xl py-4 px-6">
+                  <div className="absolute right-0 mt-2 w-64 bg-white text-gray-800 rounded-lg shadow-xl py-4 px-6 z-50">
                     <div className="space-y-3">
                       <div>
                         <p className="font-semibold mb-2">Login / Signup</p>
@@ -157,25 +337,100 @@ export default function Header() {
             </div>
           </div>
 
+          {/* Mobile Search */}
           {showMobileSearch && (
-            <form onSubmit={handleSearch} className="md:hidden mt-3">
-              <div className="relative">
-                <input
-                  type="text"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Search products..."
-                  className="w-full pl-4 pr-14 py-3 rounded-full bg-white text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#FF8C00]"
-                />
-                <button type="submit" className={`absolute right-2 top-1/2 -translate-y-1/2 bg-[#FF8C00] text-white p-2 rounded-full ${isSearching ? 'animate-spin' : ''}`}>
-                  <Search className="w-5 h-5" />
-                </button>
-              </div>
-            </form>
+            <div className="md:hidden mt-3 relative" ref={mobileSearchRef}>
+              <form onSubmit={handleSearch}>
+                <div className="relative">
+                  <input
+                    type="text"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    onKeyDown={handleKeyDown}
+                    onFocus={() => searchResults.length > 0 && setShowResults(true)}
+                    placeholder="Rechercher des produits..."
+                    className="w-full pl-4 pr-14 py-3 rounded-full bg-white text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#FF8C00]"
+                  />
+                  <button type="submit" className="absolute right-2 top-1/2 -translate-y-1/2 bg-[#FF8C00] text-white p-2 rounded-full hover:bg-[#e67e00] transition">
+                    {isSearching ? (
+                      <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    ) : (
+                      <Search className="w-5 h-5" />
+                    )}
+                  </button>
+                </div>
+              </form>
+
+              {/* Mobile Search Results */}
+              {showResults && searchResults.length > 0 && (
+                <div className="absolute top-full left-0 right-0 mt-2 bg-white text-gray-800 rounded-lg shadow-2xl max-h-[400px] overflow-y-auto z-50">
+                  {searchResults.map((product, index) => (
+                    <button
+                      key={product.id}
+                      onClick={() => navigateToProduct(product)}
+                      className={`w-full flex items-center gap-3 p-3 hover:bg-gray-50 transition border-b border-gray-100 last:border-b-0 text-left ${
+                        selectedIndex === index ? 'bg-blue-50' : ''
+                      }`}
+                    >
+                      <div className="w-12 h-12 flex-shrink-0 bg-gray-100 rounded overflow-hidden">
+                        {product.image ? (
+                          <Image
+                            src={product.image}
+                            alt={product.name}
+                            width={48}
+                            height={48}
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center text-gray-400">
+                            <Box className="w-6 h-6" />
+                          </div>
+                        )}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <h4 className="font-semibold text-xs line-clamp-2 mb-1">{product.name}</h4>
+                        <div className="text-xs">
+                          {formatPrice(product.price, product.discount_price)}
+                        </div>
+                      </div>
+                    </button>
+                  ))}
+                  
+                  {searchQuery.trim() && (
+                    <button
+                      onClick={navigateToSearchPage}
+                      className="w-full p-3 text-center text-[#0036cc] hover:bg-gray-50 font-semibold text-xs border-t-2 border-gray-200"
+                    >
+                      Voir tous les résultats
+                    </button>
+                  )}
+                </div>
+              )}
+
+              {showResults && searchResults.length === 0 && searchQuery.trim() && !isSearching && (
+                <div className="absolute top-full left-0 right-0 mt-2 bg-white text-gray-800 rounded-lg shadow-2xl p-4 text-center z-50">
+                  <Search className="w-10 h-10 text-gray-300 mx-auto mb-2" />
+                  <h3 className="font-bold text-sm mb-1">Aucun résultat</h3>
+                  <p className="text-gray-600 text-xs mb-3">
+                    Aucun résultat pour &quot;{searchQuery}&quot;
+                  </p>
+                  <Link
+                    href="/"
+                    className="text-[#0036cc] hover:text-[#FF8C00] font-semibold text-xs"
+                    onClick={() => {
+                      setShowResults(false)
+                      setShowMobileSearch(false)
+                    }}
+                  >
+                    Retour à l&apos;accueil
+                  </Link>
+                </div>
+              )}
+            </div>
           )}
         </div>
 
-        {/* Mobile Menu - À l'intérieur de la section sticky */}
+        {/* Mobile Menu */}
         {mobileMenuOpen && (
           <div className="md:hidden border-t border-white/20 bg-[#3b82f6]">
             <nav className="w-full max-w-[90%] mx-auto px-5 py-4 flex flex-col gap-3">
@@ -194,7 +449,7 @@ export default function Header() {
               <Link href="/reviews" className="text-base font-semibold hover:text-[#FF8C00] transition py-2">
                 Reviews
               </Link>
-              <Link href="https://pool.bitcoinmerch.com/" target="_blank" rel="noopener noreferrer"  className="py-3 border-b border-white/10 text-sm font-medium hover:text-[#f18a1d] transition">
+              <Link href="https://pool.bitcoinmerch.com/" target="_blank" rel="noopener noreferrer" className="py-3 border-b border-white/10 text-sm font-medium hover:text-[#f18a1d] transition">
                 Pool
               </Link>
               <Link href="/support" className="py-3 border-b border-white/10 text-sm font-medium hover:text-[#f18a1d] transition">
@@ -212,55 +467,46 @@ export default function Header() {
                   support@bitcoinmerch.com
                 </a>
               </div>
-
             </nav>
           </div>
         )}
       </div>
 
-      {/* Bottom Menu - Disparait au scroll */}
+      {/* Bottom Menu */}
       <div className="bg-[#0036cc] text-white border-t border-white/10 hidden md:block">
         <div className="w-full max-w-[90%] mx-auto px-5">
           <div className="flex items-center justify-between py-4">
             <nav className="flex items-center gap-10 flex-wrap">
               <Link href="/collections/lucky-miners" className="flex items-center gap-1.5 text-base font-semibold hover:text-[#FF8C00] transition">
                 <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 640 512">
-                    <path d="M274.9 34.3c-28.1-28.1-73.7-28.1-101.8 0L34.3 173.1c-28.1 28.1-28.1 73.7 0 101.8L173.1 413.7c28.1 28.1 73.7 28.1 101.8 0L413.7 274.9c28.1-28.1 28.1-73.7 0-101.8L274.9 34.3zM200 224a24 24 0 1 1 48 0 24 24 0 1 1 -48 0zM96 200a24 24 0 1 1 0 48 24 24 0 1 1 0-48zM224 376a24 24 0 1 1 0-48 24 24 0 1 1 0 48zM352 200a24 24 0 1 1 0 48 24 24 0 1 1 0-48zM224 120a24 24 0 1 1 0-48 24 24 0 1 1 0 48zm96 328c0 35.3 28.7 64 64 64H576c35.3 0 64-28.7 64-64V256c0-35.3-28.7-64-64-64H461.7c11.6 36 3.1 77-25.4 105.5L320 413.8V448zM480 328a24 24 0 1 1 0 48 24 24 0 1 1 0-48z"/>
-                  </svg>
-                <div className="flex flex-col leading-tight">
-                  <span>Mineurs chanceux</span>
-                </div>
+                  <path d="M274.9 34.3c-28.1-28.1-73.7-28.1-101.8 0L34.3 173.1c-28.1 28.1-28.1 73.7 0 101.8L173.1 413.7c28.1 28.1 73.7 28.1 101.8 0L413.7 274.9c28.1-28.1 28.1-73.7 0-101.8L274.9 34.3zM200 224a24 24 0 1 1 48 0 24 24 0 1 1 -48 0zM96 200a24 24 0 1 1 0 48 24 24 0 1 1 0-48zM224 376a24 24 0 1 1 0-48 24 24 0 1 1 0 48zM352 200a24 24 0 1 1 0 48 24 24 0 1 1 0-48zM224 120a24 24 0 1 1 0-48 24 24 0 1 1 0 48zm96 328c0 35.3 28.7 64 64 64H576c35.3 0 64-28.7 64-64V256c0-35.3-28.7-64-64-64H461.7c11.6 36 3.1 77-25.4 105.5L320 413.8V448zM480 328a24 24 0 1 1 0 48 24 24 0 1 1 0-48z"/>
+                </svg>
+                <span>Mineurs chanceux</span>
               </Link>
               <Link href="/collections/bitaxe-miners" className="flex items-center gap-1.5 text-base font-semibold hover:text-[#FF8C00] transition">
                 <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 512 512">
-                    <path d="M176 24c0-13.3-10.7-24-24-24s-24 10.7-24 24V64c-35.3 0-64 28.7-64 64H24c-13.3 0-24 10.7-24 24s10.7 24 24 24H64v56H24c-13.3 0-24 10.7-24 24s10.7 24 24 24H64v56H24c-13.3 0-24 10.7-24 24s10.7 24 24 24H64c0 35.3 28.7 64 64 64v40c0 13.3 10.7 24 24 24s24-10.7 24-24V448h56v40c0 13.3 10.7 24 24 24s24-10.7 24-24V448h56v40c0 13.3 10.7 24 24 24s24-10.7 24-24V448c35.3 0 64-28.7 64-64h40c13.3 0 24-10.7 24-24s-10.7-24-24-24H448V280h40c13.3 0 24-10.7 24-24s-10.7-24-24-24H448V176h40c13.3 0 24-10.7 24-24s-10.7-24-24-24H448c0-35.3-28.7-64-64-64V24c0-13.3-10.7-24-24-24s-24 10.7-24 24V64H280V24c0-13.3-10.7-24-24-24s-24 10.7-24 24V64H176V24zM160 128H352c17.7 0 32 14.3 32 32V352c0 17.7-14.3 32-32 32H160c-17.7 0-32-14.3-32-32V160c0-17.7 14.3-32 32-32zm192 32H160V352H352V160z"/>
-                  </svg>
-                <div className="flex flex-col leading-tight">
-                  <span>Mineurs de Bitaxe</span>
-                </div>
+                  <path d="M176 24c0-13.3-10.7-24-24-24s-24 10.7-24 24V64c-35.3 0-64 28.7-64 64H24c-13.3 0-24 10.7-24 24s10.7 24 24 24H64v56H24c-13.3 0-24 10.7-24 24s10.7 24 24 24H64v56H24c-13.3 0-24 10.7-24 24s10.7 24 24 24H64c0 35.3 28.7 64 64 64v40c0 13.3 10.7 24 24 24s24-10.7 24-24V448h56v40c0 13.3 10.7 24 24 24s24-10.7 24-24V448h56v40c0 13.3 10.7 24 24 24s24-10.7 24-24V448c35.3 0 64-28.7 64-64h40c13.3 0 24-10.7 24-24s-10.7-24-24-24H448V280h40c13.3 0 24-10.7 24-24s-10.7-24-24-24H448V176h40c13.3 0 24-10.7 24-24s-10.7-24-24-24H448c0-35.3-28.7-64-64-64V24c0-13.3-10.7-24-24-24s-24 10.7-24 24V64H280V24c0-13.3-10.7-24-24-24s-24 10.7-24 24V64H176V24zM160 128H352c17.7 0 32 14.3 32 32V352c0 17.7-14.3 32-32 32H160c-17.7 0-32-14.3-32-32V160c0-17.7 14.3-32 32-32zm192 32H160V352H352V160z"/>
+                </svg>
+                <span>Mineurs de Bitaxe</span>
               </Link>
               <Link href="/battle-pass" className="flex items-center gap-1.5 text-base font-semibold hover:text-[#FF8C00] transition">
-                <Trophy className="w-5 h-5 flex-shrink-0" />
-                <div className="flex flex-col leading-tight">
-                  <span>Passe de combat</span>
-                </div>
+                <Trophy className="w-5 h-5" />
+                <span>Passe de combat</span>
               </Link>
               <Link href="/video-guides" className="flex items-center gap-1.5 text-base font-semibold hover:text-[#FF8C00] transition">
-                <Video className="w-5 h-5 flex-shrink-0" />
-                <div className="flex flex-col leading-tight">
-                  <span>Guides vidéo</span>
-                </div>
+                <Video className="w-5 h-5" />
+                <span>Guides vidéo</span>
               </Link>
-              <Link href="/reviews" className="flex items-center gap-1.5 text-base font-semibold hover:text-[#FF8C00] transition whitespace-nowrap">
-                <Star className="w-5 h-5 flex-shrink-0" />
+              <Link href="/reviews" className="flex items-center gap-1.5 text-base font-semibold hover:text-[#FF8C00] transition">
+                <Star className="w-5 h-5" />
                 Avis
               </Link>
-              <Link href="https://pool.bitcoinmerch.com/" target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 text-base font-semibold hover:text-[#FF8C00] transition whitespace-nowrap">
-                <Droplets className="w-5 h-5 flex-shrink-0" />
+              <Link href="https://pool.bitcoinmerch.com/" target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 text-base font-semibold hover:text-[#FF8C00] transition">
+                <Droplets className="w-5 h-5" />
                 Piscine
               </Link>
-              <Link href="/support" className="flex items-center gap-1.5 text-base font-semibold hover:text-[#FF8C00] transition whitespace-nowrap">
-                <Headphones className="w-5 h-5 flex-shrink-0" />
+              <Link href="/support" className="flex items-center gap-1.5 text-base font-semibold hover:text-[#FF8C00] transition">
+                <Headphones className="w-5 h-5" />
                 Assistance
               </Link>
             </nav>
@@ -276,86 +522,6 @@ export default function Header() {
               <a href="tel:8775000282" className="text-base font-semibold hover:text-[#FF8C00] transition whitespace-nowrap">
                 (877) 500‑0282
               </a>
-
-              {/* Currency & Language Selector - Combined */}
-              {/* <div className="relative hidden sm:block">
-                <button 
-                  onClick={() => setSettingsDropdown(!settingsDropdown)}
-                  className="flex items-center gap-2 text-base font-semibold hover:text-[#FF8C00] transition px-3 py-2 rounded hover:bg-white/10"
-                >
-                  <span>{currency}</span>
-                  <span className="text-base">|</span>
-                  <span>{language}</span>
-                  <Image 
-                    src="https://flagcdn.com/w40/gb.png" 
-                    alt="Language" 
-                    width={24}
-                    height={16}
-                    className="rounded"
-                  />
-                  <ChevronDown className="w-4 h-4" />
-                </button>
-                
-                {settingsDropdown && (
-                  <div className="absolute right-0 mt-2 w-56 bg-white text-gray-800 rounded-lg shadow-xl py-4 z-50">
-                    {/* Language Section 
-                    <div className="px-4 py-2 border-b">
-                      <p className="text-sm font-semibold text-gray-600 mb-2">Language</p>
-                      <button
-                        onClick={() => {
-                          setLanguage('English')
-                        }}
-                        className="w-full text-left px-3 py-2 hover:bg-[#3b82f6] hover:text-white transition flex items-center gap-2 rounded mb-1"
-                      >
-                        <Image 
-                          src="https://flagcdn.com/w40/gb.png" 
-                          alt="English" 
-                          width={20}
-                          height={14}
-                          className="rounded"
-                        />
-                        English
-                      </button>
-                      <button
-                        onClick={() => {
-                          setLanguage('Français')
-                        }}
-                        className="w-full text-left px-3 py-2 hover:bg-[#3b82f6] hover:text-white transition flex items-center gap-2 rounded"
-                      >
-                        <Image 
-                          src="https://flagcdn.com/w40/fr.png" 
-                          alt="Français" 
-                          width={20}
-                          height={14}
-                          className="rounded"
-                        />
-                        Français
-                      </button>
-                    </div>
-
-                    {/* Currency Section 
-                    <div className="px-4 py-2">
-                      <p className="text-sm font-semibold text-gray-600 mb-2">Currency</p>
-                      <button
-                        onClick={() => {
-                          setCurrency('EUR')
-                        }}
-                        className="w-full text-left px-3 py-2 hover:bg-[#3b82f6] hover:text-white transition rounded mb-1"
-                      >
-                        <span className="font-semibold">€ EUR</span>
-                      </button>
-                      <button
-                        onClick={() => {
-                          setCurrency('USD')
-                        }}
-                        className="w-full text-left px-3 py-2 hover:bg-[#3b82f6] hover:text-white transition rounded"
-                      >
-                        <span className="font-semibold">$ USD</span>
-                      </button>
-                    </div>
-                  </div>
-                )}
-              </div>*/}
             </div>
           </div>
         </div>

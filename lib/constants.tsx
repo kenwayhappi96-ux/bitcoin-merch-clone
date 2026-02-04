@@ -294,3 +294,14 @@ export const videoGuides = [
     link:'/video-guides/video-6'
   }
 ]
+
+export const winners = [
+  'https://cdn.shopify.com/s/files/1/2609/9556/files/4_0c10f616-9946-408d-aae9-46a6cfdaaa31.png?v=1762277114&width=2048',
+  'https://cdn.shopify.com/s/files/1/2609/9556/files/3_c80c33fc-fb99-4c2f-a752-4f0d49a80d2d.png?v=1762277113&width=2048',
+  'https://cdn.shopify.com/s/files/1/2609/9556/files/2_5c76222e-86df-4db0-a85e-6cca8020e215.png?v=1762277114&width=2048',
+  'https://cdn.shopify.com/s/files/1/2609/9556/files/1_94fcb2db-414a-4dc8-9a70-12b665fe5ae2.png?v=1762277113&width=2048',
+  'https://cdn.shopify.com/s/files/1/2609/9556/files/2_5c76222e-86df-4db0-a85e-6cca8020e215.png?v=1762277114&width=2048',
+  'https://cdn.shopify.com/s/files/1/2609/9556/files/3_c80c33fc-fb99-4c2f-a752-4f0d49a80d2d.png?v=1762277113&width=2048',
+  'https://cdn.shopify.com/s/files/1/2609/9556/files/4_0c10f616-9946-408d-aae9-46a6cfdaaa31.png?v=1762277114&width=2048',
+  'https://cdn.shopify.com/s/files/1/2609/9556/files/5_5e1c6eef-c23e-4996-9323-dde2ecc113c6.png?v=1762277113&width=2048'
+]

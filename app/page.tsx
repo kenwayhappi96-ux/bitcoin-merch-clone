@@ -48,7 +48,7 @@ export default async function Home() {
             <div className="my-2">
               <span className="text-sm text-gray-600">4.4 out of 5 • Based on 900+ reviews</span>
             </div>
-            <Link href="https://www.trustpilot.com/review/bitcoinmerch.com" target="_blank" className="text-blue-600 hover:underline text-sm">
+            <Link href="https://www.trustpilot.com/review/bitcoinmerch.com" target="_blank" className="text-black text-sm">
               Trustpilot
             </Link>
           </div>

@@ -1,11 +1,12 @@
 import mysql from 'mysql2/promise';
 
-// Configuration de la connexion MySQL
+// Configuration de la connexion MySQL avec variables d'environnement
 const pool = mysql.createPool({
-  host: 'localhost',
-  user: 'root',
-  password: '', // WAMP par défaut
-  database: 'bitcoin_merch',
+  host: process.env.DB_HOST || 'localhost',
+  user: process.env.DB_USER || 'root',
+  password: process.env.DB_PASSWORD || '',
+  database: process.env.DB_NAME || 'bitcoin_merch',
+  port: parseInt(process.env.DB_PORT || '3306', 10),
   waitForConnections: true,
   connectionLimit: 10,
   queueLimit: 0,

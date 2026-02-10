@@ -4,10 +4,17 @@ import { useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useAppSelector } from '@/store/hooks'
-import { ChevronDown } from 'lucide-react'
+import { ChevronDown, ChevronLeft, Lock, Info } from 'lucide-react'
 
 export default function CheckoutPage() {
-  const { items } = useAppSelector((state) => state.cart)
+  const { items, shippingProtection, protectionFee } = useAppSelector((state: any) => state.cart)
+
+  // States supplémentaires
+  const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [testMode, setTestMode] = useState(false) // Mode test pour développement
+
+  // Contact / shipping form
   const [email, setEmail] = useState('')
   const [emailNews, setEmailNews] = useState(false)
   const [firstName, setFirstName] = useState('')
@@ -16,393 +23,718 @@ export default function CheckoutPage() {
   const [address, setAddress] = useState('')
   const [apartment, setApartment] = useState('')
   const [city, setCity] = useState('')
+  const [country, setCountry] = useState('United States')
+  const [region, setRegion] = useState('')
   const [zipCode, setZipCode] = useState('')
   const [phone, setPhone] = useState('')
   const [saveInfo, setSaveInfo] = useState(false)
-  const [textNews, setTextNews] = useState(false)
-  const [deliveryMethod, setDeliveryMethod] = useState<'ship' | 'pickup'>('ship')
-  const [paymentMethod, setPaymentMethod] = useState<'credit' | 'paypal' | 'coinbase' | 'afterpay' | 'cashapp'>('credit')
+
+  // Payment
+  const [paymentMethod, setPaymentMethod] = useState<'credit' | 'paypal' | 'coinbase'>('credit')
   const [useSameAddress, setUseSameAddress] = useState(true)
   const [discountCode, setDiscountCode] = useState('')
+  const [cardNumber, setCardNumber] = useState('')
+  const [cardExpiry, setCardExpiry] = useState('')
+  const [cardCvc, setCardCvc] = useState('')
+  const [cardName, setCardName] = useState('')
 
-  const subtotal = items.reduce((sum, item) => sum + (item.discount_price || item.price) * item.quantity, 0)
-  const savings = items.reduce((sum, item) => {
-    if (item.discount_price) {
-      return sum + (item.price - item.discount_price) * item.quantity
-    }
+  // Totals - utiliser des données de test si panier vide et mode test activé
+  const testItems = [
+    { id: 1, name: 'Test Product', price: 100, discount_price: 80, quantity: 1, image: '/test.jpg' }
+  ]
+  const itemsToUse = testMode && items.length === 0 ? testItems : items
+  const subtotal = itemsToUse.reduce((sum: number, item: any) => sum + (item.discount_price ?? item.price) * item.quantity, 0)
+  const savings = itemsToUse.reduce((sum: number, item: any) => {
+    if (item.discount_price) return sum + (item.price - item.discount_price) * item.quantity
     return sum
   }, 0)
 
+  // Shipping options
+  const shippingOptions = [
+    { id: 'usps_first_class', name: 'USPS First-Class Package International Service', eta: '7 to 21 business days', price: 31.35 },
+    { id: 'fedex_connect_plus', name: 'FedEx International Connect Plus', eta: '—', price: 53.66 },
+    { id: 'usps_priority', name: 'USPS Priority Mail International', eta: '6 to 10 business days', price: 99.23 },
+    { id: 'ups_expedited', name: 'UPS Worldwide Expedited®', eta: '4 to 6 business days', price: 100.10 },
+    { id: 'usps_express', name: 'USPS Priority Mail Express International', eta: '3 to 5 business days', price: 120.03 },
+    { id: 'ups_saver', name: 'UPS Worldwide Saver®', eta: '4 to 6 business days', price: 121.08 },
+    { id: 'dhl_express', name: 'DHL Express Worldwide', eta: '3 to 5 business days', price: 142.11 },
+  ]
+
+  const [selectedShippingId, setSelectedShippingId] = useState<string>(shippingOptions[0].id)
+  const selectedShipping = shippingOptions.find((s) => s.id === selectedShippingId)
+  const shipping = selectedShipping?.price ?? 0
+  const protection = shippingProtection ? protectionFee : 0
+  const total = subtotal + shipping + protection
+
+  const format = (v: number) => v.toLocaleString('en-US', { style: 'currency', currency: 'USD' })
+
+  const handleSelectShipping = (id: string) => {
+    setSelectedShippingId(id)
+  }
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setError(null)
+    
+    // Validation des champs requis
+    if (!email) {
+      setError('Email is required.')
+      return
+    }
+    if (!firstName) {
+      setError('First name is required.')
+      return
+    }
+    if (!lastName) {
+      setError('Last name is required.')
+      return
+    }
+    if (!address) {
+      setError('Address is required.')
+      return
+    }
+    if (!city) {
+      setError('City is required.')
+      return
+    }
+    if (!country) {
+      setError('Country is required.')
+      return
+    }
+    // ZIP code only required for specific countries
+    const countriesRequiringZip = ['United States', 'Canada', 'Germany', 'France']
+    if (countriesRequiringZip.includes(country) && !zipCode) {
+      setError('ZIP code is required for your country.')
+      return
+    }
+    // Permettre test si mode test activé
+    if (!testMode && itemsToUse.length === 0) {
+      setError('Your cart is empty.')
+      return
+    }
+
+    setIsLoading(true)
+
+    try {
+      // Créer la commande dans la base de données
+      const orderResponse = await fetch('/api/orders', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email,
+          firstName,
+          lastName,
+          address,
+          apartment,
+          city,
+          region,
+          zipCode,
+          country,
+          phone,
+          company,
+          shippingMethod: selectedShipping?.name,
+          shippingCost: shipping,
+          protectionEnabled: shippingProtection,
+          protectionFee: protection,
+          items: itemsToUse,
+          subtotal,
+          total,
+          notes: testMode ? '[TEST MODE] Test order' : '',
+          paymentMethod,
+        }),
+      })
+
+      const orderData = await orderResponse.json()
+
+      if (!orderData.success) {
+        setError(orderData.error || 'Erreur lors de la création de la commande')
+        setIsLoading(false)
+        return
+      }
+
+      // Passer au paiement Stripe (prochainement)
+      // Pour l'instant, rediriger vers une page de confirmation
+      window.location.href = `/order-confirmation?orderId=${orderData.orderId}&orderNumber=${orderData.orderNumber}`
+    } catch (err) {
+      setError('Erreur réseau. Veuillez réessayer.')
+      console.error('Checkout error:', err)
+      setIsLoading(false)
+    }
+  }
+
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="max-w-7xl mx-auto px-4 py-8">
-        <div className="text-center mb-8">
-          <Link href="/">
-            <Image 
-              src="/ref/logo.png" 
-              alt="Bitcoin Merch" 
-              width={200}
-              height={60}
-              className="h-16 w-auto mx-auto mb-4"
-            />
-          </Link>
-          <h1 className="text-3xl font-bold text-gray-800">Bitcoin Merch Checkout</h1>
+      {/* Header with logo */}
+      <header className="bg-white border-b border-gray-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+          <div className="flex items-center justify-center">
+            <Link href="/">
+              <Image src="/ref/logo.png" alt="Bitcoin Merch" width={140} height={40} className="h-9 w-auto" />
+            </Link>
+          </div>
         </div>
+      </header>
 
-        <div className="grid lg:grid-cols-2 gap-8">
-          {/* Left Column - Forms */}
-          <div className="bg-white rounded-lg shadow-lg p-6 space-y-6">
-            {/* Express Checkout */}
-            <div>
-              <h2 className="text-xl font-bold mb-4">Express checkout</h2>
-              <div className="grid grid-cols-3 gap-3">
-                <button className="border-2 border-gray-300 rounded-lg py-3 hover:border-[#3b82f6] transition">
-                  <span className="font-semibold">Shop Pay</span>
-                </button>
-                <button className="border-2 border-gray-300 rounded-lg py-3 hover:border-[#3b82f6] transition">
-                  <span className="font-semibold">PayPal</span>
-                </button>
-                <button className="border-2 border-gray-300 rounded-lg py-3 hover:border-[#3b82f6] transition">
-                  <span className="font-semibold">G Pay</span>
-                </button>
-              </div>
-              <div className="text-center my-4 text-gray-500 font-semibold">OR</div>
-            </div>
-
-            {/* Contact */}
-            <div>
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="text-xl font-bold">Contact</h2>
-                <Link href="/login" target="_blank" className="text-[#3b82f6] hover:underline text-sm">
-                  Sign in
-                </Link>
-              </div>
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="Email"
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#3b82f6] focus:border-transparent outline-none"
-              />
-              <label className="flex items-center gap-2 mt-3 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={emailNews}
-                  onChange={(e) => setEmailNews(e.target.checked)}
-                  className="w-5 h-5"
-                />
-                <span className="text-sm text-gray-700">Email me with news and offers</span>
-              </label>
-            </div>
-
-            {/* Delivery */}
-            <div>
-              <h2 className="text-xl font-bold mb-4">Delivery</h2>
-              <p className="text-sm text-gray-600 mb-3">Choose a delivery method</p>
-              <div className="flex gap-4 mb-4">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12">
+          {/* Left Column - Checkout Form (lg:col-span-7) */}
+          <div className="lg:col-span-7">
+            {/* Breadcrumb */}
+            <div className="mb-6 flex items-center justify-between">
+              <Link href="/cart" className="inline-flex items-center text-sm text-blue-600 hover:text-blue-700">
+                <ChevronLeft className="w-4 h-4 mr-1" />
+                Show order summary
+              </Link>
+              {/* Test Mode Button */}
+              {process.env.NODE_ENV === 'development' && (
                 <button
-                  onClick={() => setDeliveryMethod('ship')}
-                  className={`flex-1 py-3 rounded-lg font-semibold transition ${
-                    deliveryMethod === 'ship'
-                      ? 'bg-[#3b82f6] text-white'
-                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  type="button"
+                  onClick={() => setTestMode(!testMode)}
+                  className={`text-xs px-3 py-1 rounded font-medium transition ${
+                    testMode
+                      ? 'bg-green-100 text-green-700 border border-green-300'
+                      : 'bg-gray-100 text-gray-600 border border-gray-300'
                   }`}
                 >
-                  Ship
+                  {testMode ? '✓ Test Mode ON' : 'Test Mode OFF'}
                 </button>
-                <button
-                  onClick={() => setDeliveryMethod('pickup')}
-                  className={`flex-1 py-3 rounded-lg font-semibold transition ${
-                    deliveryMethod === 'pickup'
-                      ? 'bg-[#3b82f6] text-white'
-                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                  }`}
-                >
-                  Pick up
-                </button>
-              </div>
-
-              <div className="relative mb-4">
-                <select className="w-full px-4 py-3 border border-gray-300 rounded-lg appearance-none focus:ring-2 focus:ring-[#3b82f6] focus:border-transparent outline-none">
-                  <option>United States</option>
-                  <option>Canada</option>
-                </select>
-                <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500 pointer-events-none" />
-              </div>
-
-              <div className="grid grid-cols-2 gap-4 mb-4">
-                <input
-                  type="text"
-                  value={firstName}
-                  onChange={(e) => setFirstName(e.target.value)}
-                  placeholder="First name"
-                  className="px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#3b82f6] focus:border-transparent outline-none"
-                />
-                <input
-                  type="text"
-                  value={lastName}
-                  onChange={(e) => setLastName(e.target.value)}
-                  placeholder="Last name"
-                  className="px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#3b82f6] focus:border-transparent outline-none"
-                />
-              </div>
-
-              <input
-                type="text"
-                value={company}
-                onChange={(e) => setCompany(e.target.value)}
-                placeholder="Company (optional)"
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#3b82f6] focus:border-transparent outline-none mb-4"
-              />
-
-              <input
-                type="text"
-                value={address}
-                onChange={(e) => setAddress(e.target.value)}
-                placeholder="Address"
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#3b82f6] focus:border-transparent outline-none mb-4"
-              />
-
-              <input
-                type="text"
-                value={apartment}
-                onChange={(e) => setApartment(e.target.value)}
-                placeholder="Apartment, suite, etc. (optional)"
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#3b82f6] focus:border-transparent outline-none mb-4"
-              />
-
-              <div className="grid grid-cols-2 gap-4 mb-4">
-                <input
-                  type="text"
-                  value={city}
-                  onChange={(e) => setCity(e.target.value)}
-                  placeholder="City"
-                  className="px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#3b82f6] focus:border-transparent outline-none"
-                />
-                <input
-                  type="text"
-                  value={zipCode}
-                  onChange={(e) => setZipCode(e.target.value)}
-                  placeholder="ZIP code"
-                  className="px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#3b82f6] focus:border-transparent outline-none"
-                />
-              </div>
-
-              <input
-                type="tel"
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-                placeholder="Phone"
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#3b82f6] focus:border-transparent outline-none mb-3"
-              />
-
-              <label className="flex items-center gap-2 mb-3 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={saveInfo}
-                  onChange={(e) => setSaveInfo(e.target.checked)}
-                  className="w-5 h-5"
-                />
-                <span className="text-sm text-gray-700">Save this information for next time</span>
-              </label>
-
-              <label className="flex items-center gap-2 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={textNews}
-                  onChange={(e) => setTextNews(e.target.checked)}
-                  className="w-5 h-5"
-                />
-                <span className="text-sm text-gray-700">Text me with news and offers</span>
-              </label>
+              )}
             </div>
 
-            {/* Shipping Method */}
-            <div>
-              <h2 className="text-xl font-bold mb-4">Shipping method</h2>
-              <p className="text-sm text-gray-600">Enter your shipping address to view available shipping methods.</p>
-            </div>
-
-            {/* Payment */}
-            <div>
-              <h2 className="text-xl font-bold mb-4">Payment</h2>
-              <p className="text-sm text-gray-600 mb-4">All transactions are secure and encrypted.</p>
-
+            <form onSubmit={handleSubmit} className="space-y-6">
+              {/* Error Message */}
+              {error && (
+                <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+                  <p className="text-sm text-red-600">{error}</p>
+                </div>
+              )}
+              {/* Express Checkout Options */}
               <div className="space-y-3">
-                <button
-                  onClick={() => setPaymentMethod('credit')}
-                  className={`w-full text-left p-4 border-2 rounded-lg transition ${
-                    paymentMethod === 'credit' ? 'border-[#3b82f6] bg-blue-50' : 'border-gray-300'
-                  }`}
-                >
-                  <div className="flex items-center justify-between">
-                    <span className="font-semibold">Credit card</span>
-                    <div className="flex gap-2">
-                      <span className="text-xs bg-gray-200 px-2 py-1 rounded">VISA</span>
-                      <span className="text-xs bg-gray-200 px-2 py-1 rounded">MASTERCARD</span>
-                      <span className="text-xs bg-gray-200 px-2 py-1 rounded">+3</span>
-                    </div>
-                  </div>
-                </button>
+                <h2 className="text-xl font-semibold text-gray-900">Express checkout</h2>
+                <div className="grid grid-cols-3 gap-3">
+                  <button type="button" className="h-12 flex items-center justify-center bg-[#5A31F4] hover:bg-[#4A21E4] text-white rounded font-medium transition">
+                    Shop Pay
+                  </button>
+                  <button type="button" className="h-12 flex items-center justify-center bg-[#FFC439] hover:bg-[#EFB429] text-black rounded font-medium transition">
+                    PayPal
+                  </button>
+                  <button type="button" className="h-12 flex items-center justify-center bg-black hover:bg-gray-900 text-white rounded font-medium transition">
+                    G Pay
+                  </button>
+                </div>
+                <div className="flex items-center gap-4 my-4">
+                  <div className="flex-1 border-t border-gray-300"></div>
+                  <span className="text-sm text-gray-500">OR</span>
+                  <div className="flex-1 border-t border-gray-300"></div>
+                </div>
+              </div>
 
-                <label className="flex items-center gap-2 cursor-pointer text-sm text-gray-700 ml-4">
+              {/* Contact Information */}
+              <div>
+                <div className="flex items-center justify-between mb-3">
+                  <h3 className="text-lg font-semibold text-gray-900">Contact</h3>
+                  <Link href="/login" className="text-sm text-blue-600 hover:text-blue-700">
+                    Log in
+                  </Link>
+                </div>
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="Email"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
+                />
+                <label className="flex items-center gap-2 mt-3 cursor-pointer">
                   <input
                     type="checkbox"
-                    checked={useSameAddress}
-                    onChange={(e) => setUseSameAddress(e.target.checked)}
-                    className="w-5 h-5"
+                    checked={emailNews}
+                    onChange={(e) => setEmailNews(e.target.checked)}
+                    className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                   />
-                  Use shipping address as billing address
+                  <span className="text-sm text-gray-700">Email me with news and offers</span>
                 </label>
-
-                <button
-                  onClick={() => setPaymentMethod('paypal')}
-                  className={`w-full text-left p-4 border-2 rounded-lg transition ${
-                    paymentMethod === 'paypal' ? 'border-[#3b82f6] bg-blue-50' : 'border-gray-300'
-                  }`}
-                >
-                  <span className="font-semibold">PayPal</span>
-                </button>
-
-                <button
-                  onClick={() => setPaymentMethod('coinbase')}
-                  className={`w-full text-left p-4 border-2 rounded-lg transition ${
-                    paymentMethod === 'coinbase' ? 'border-[#3b82f6] bg-blue-50' : 'border-gray-300'
-                  }`}
-                >
-                  <div className="flex items-center justify-between">
-                    <span className="font-semibold">Coinbase Commerce</span>
-                    <div className="flex gap-2">
-                      <span className="text-xs bg-gray-200 px-2 py-1 rounded">bitcoin</span>
-                      <span className="text-xs bg-gray-200 px-2 py-1 rounded">ethereum</span>
-                      <span className="text-xs bg-gray-200 px-2 py-1 rounded">+4</span>
-                    </div>
-                  </div>
-                </button>
-
-                <button
-                  onClick={() => setPaymentMethod('afterpay')}
-                  className={`w-full text-left p-4 border-2 rounded-lg transition ${
-                    paymentMethod === 'afterpay' ? 'border-[#3b82f6] bg-blue-50' : 'border-gray-300'
-                  }`}
-                >
-                  <span className="font-semibold">Afterpay</span>
-                </button>
-
-                <button
-                  onClick={() => setPaymentMethod('cashapp')}
-                  className={`w-full text-left p-4 border-2 rounded-lg transition ${
-                    paymentMethod === 'cashapp' ? 'border-[#3b82f6] bg-blue-50' : 'border-gray-300'
-                  }`}
-                >
-                  <span className="font-semibold">Cash App Pay</span>
-                </button>
               </div>
-            </div>
 
-            {/* Trust Badges */}
-            <div className="grid grid-cols-3 gap-4 py-4 border-t">
-              <div className="text-center">
-                <p className="text-xs font-semibold text-gray-700">Secure Payments</p>
-              </div>
-              <div className="text-center">
-                <p className="text-xs font-semibold text-gray-700">30-Day Money Back Guarantee</p>
-              </div>
-              <div className="text-center">
-                <p className="text-xs font-semibold text-gray-700">Fast Shipping</p>
-              </div>
-            </div>
-
-            <button className="w-full bg-[#3b82f6] text-white py-4 rounded-lg font-bold text-lg hover:bg-[#2563eb] transition">
-              Submit
-            </button>
-          </div>
-
-          {/* Right Column - Order Summary */}
-          <div className="bg-white rounded-lg shadow-lg p-6 h-fit sticky top-4">
-            <h2 className="text-2xl font-bold mb-6">Order summary</h2>
-            <h3 className="text-lg font-semibold mb-4">Shopping cart</h3>
-
-            {/* Cart Items */}
-            <div className="space-y-4 mb-6">
-              {items.map((item) => (
-                <div key={item.id} className="flex gap-4">
+              {/* Delivery */}
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900 mb-3">Delivery</h3>
+                
+                <div className="space-y-3">
+                  {/* Country/Region */}
                   <div className="relative">
-                    <Image
-                      src={item.image || '/ref/logo.png'}
-                      alt={item.name}
-                      width={80}
-                      height={80}
-                      className="rounded object-cover"
-                    />
-                    <span className="absolute -top-2 -right-2 bg-gray-600 text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center">
-                      {item.quantity}
-                    </span>
+                    <select
+                      value={country}
+                      onChange={(e) => setCountry(e.target.value)}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg appearance-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none bg-white transition"
+                    >
+                      <option>United States</option>
+                      <option>Canada</option>
+                      <option>United Kingdom</option>
+                      <option>France</option>
+                      <option>Germany</option>
+                      <option>Australia</option>
+                    </select>
+                    <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
+                    <label className="absolute left-4 -top-2 px-1 bg-gray-50 text-xs text-gray-600">
+                      Country/Region
+                    </label>
                   </div>
-                  <div className="flex-1">
-                    <h4 className="font-semibold text-sm">{item.name}</h4>
-                    <div className="flex items-center gap-2 mt-1">
-                      {item.discount_price ? (
-                        <>
-                          <span className="text-[#3b82f6] font-bold">${item.discount_price.toFixed(2)}</span>
-                          <span className="text-gray-400 line-through text-sm">${item.price.toFixed(2)}</span>
-                        </>
-                      ) : (
-                        <span className="text-[#3b82f6] font-bold">${item.price.toFixed(2)}</span>
-                      )}
+
+                  {/* First Name & Last Name */}
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="relative">
+                      <input
+                        value={firstName}
+                        onChange={(e) => setFirstName(e.target.value)}
+                        placeholder=" "
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none peer transition"
+                      />
+                      <label className="absolute left-4 top-3 text-gray-500 transition-all peer-focus:-top-2 peer-focus:text-xs peer-focus:bg-gray-50 peer-focus:px-1 peer-[:not(:placeholder-shown)]:-top-2 peer-[:not(:placeholder-shown)]:text-xs peer-[:not(:placeholder-shown)]:bg-gray-50 peer-[:not(:placeholder-shown)]:px-1">
+                        First name
+                      </label>
                     </div>
+                    <div className="relative">
+                      <input
+                        value={lastName}
+                        onChange={(e) => setLastName(e.target.value)}
+                        placeholder=" "
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none peer transition"
+                      />
+                      <label className="absolute left-4 top-3 text-gray-500 transition-all peer-focus:-top-2 peer-focus:text-xs peer-focus:bg-gray-50 peer-focus:px-1 peer-[:not(:placeholder-shown)]:-top-2 peer-[:not(:placeholder-shown)]:text-xs peer-[:not(:placeholder-shown)]:bg-gray-50 peer-[:not(:placeholder-shown)]:px-1">
+                        Last name
+                      </label>
+                    </div>
+                  </div>
+
+                  {/* Company */}
+                  <div className="relative">
+                    <input
+                      value={company}
+                      onChange={(e) => setCompany(e.target.value)}
+                      placeholder=" "
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none peer transition"
+                    />
+                    <label className="absolute left-4 top-3 text-gray-500 transition-all peer-focus:-top-2 peer-focus:text-xs peer-focus:bg-gray-50 peer-focus:px-1 peer-[:not(:placeholder-shown)]:-top-2 peer-[:not(:placeholder-shown)]:text-xs peer-[:not(:placeholder-shown)]:bg-gray-50 peer-[:not(:placeholder-shown)]:px-1">
+                      Company (optional)
+                    </label>
+                  </div>
+
+                  {/* Address */}
+                  <div className="relative">
+                    <input
+                      value={address}
+                      onChange={(e) => setAddress(e.target.value)}
+                      placeholder=" "
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none peer transition"
+                    />
+                    <label className="absolute left-4 top-3 text-gray-500 transition-all peer-focus:-top-2 peer-focus:text-xs peer-focus:bg-gray-50 peer-focus:px-1 peer-[:not(:placeholder-shown)]:-top-2 peer-[:not(:placeholder-shown)]:text-xs peer-[:not(:placeholder-shown)]:bg-gray-50 peer-[:not(:placeholder-shown)]:px-1">
+                      Address
+                    </label>
+                  </div>
+
+                  {/* Apartment */}
+                  <div className="relative">
+                    <input
+                      value={apartment}
+                      onChange={(e) => setApartment(e.target.value)}
+                      placeholder=" "
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none peer transition"
+                    />
+                    <label className="absolute left-4 top-3 text-gray-500 transition-all peer-focus:-top-2 peer-focus:text-xs peer-focus:bg-gray-50 peer-focus:px-1 peer-[:not(:placeholder-shown)]:-top-2 peer-[:not(:placeholder-shown)]:text-xs peer-[:not(:placeholder-shown)]:bg-gray-50 peer-[:not(:placeholder-shown)]:px-1">
+                      Apartment, suite, etc. (optional)
+                    </label>
+                  </div>
+
+                  {/* City, State, Zip */}
+                  <div className="grid grid-cols-3 gap-3">
+                    <div className="relative">
+                      <input
+                        value={city}
+                        onChange={(e) => setCity(e.target.value)}
+                        placeholder=" "
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none peer transition"
+                      />
+                      <label className="absolute left-4 top-3 text-gray-500 transition-all peer-focus:-top-2 peer-focus:text-xs peer-focus:bg-gray-50 peer-focus:px-1 peer-[:not(:placeholder-shown)]:-top-2 peer-[:not(:placeholder-shown)]:text-xs peer-[:not(:placeholder-shown)]:bg-gray-50 peer-[:not(:placeholder-shown)]:px-1">
+                        City
+                      </label>
+                    </div>
+                    <div className="relative">
+                      <select
+                        value={region}
+                        onChange={(e) => setRegion(e.target.value)}
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg appearance-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none bg-white transition"
+                      >
+                        <option value="">State</option>
+                        <option>California</option>
+                        <option>New York</option>
+                        <option>Texas</option>
+                        <option>Florida</option>
+                      </select>
+                      <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+                      <label className="absolute left-4 -top-2 px-1 bg-gray-50 text-xs text-gray-600">
+                        State
+                      </label>
+                    </div>
+                    <div className="relative">
+                      <input
+                        value={zipCode}
+                        onChange={(e) => setZipCode(e.target.value)}
+                        placeholder=" "
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none peer transition"
+                      />
+                      <label className="absolute left-4 top-3 text-gray-500 transition-all peer-focus:-top-2 peer-focus:text-xs peer-focus:bg-gray-50 peer-focus:px-1 peer-[:not(:placeholder-shown)]:-top-2 peer-[:not(:placeholder-shown)]:text-xs peer-[:not(:placeholder-shown)]:bg-gray-50 peer-[:not(:placeholder-shown)]:px-1">
+                        ZIP code
+                      </label>
+                    </div>
+                  </div>
+
+                  {/* Phone */}
+                  <div className="relative">
+                    <input
+                      value={phone}
+                      onChange={(e) => setPhone(e.target.value)}
+                      placeholder=" "
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none peer transition"
+                    />
+                    <label className="absolute left-4 top-3 text-gray-500 transition-all peer-focus:-top-2 peer-focus:text-xs peer-focus:bg-gray-50 peer-focus:px-1 peer-[:not(:placeholder-shown)]:-top-2 peer-[:not(:placeholder-shown)]:text-xs peer-[:not(:placeholder-shown)]:bg-gray-50 peer-[:not(:placeholder-shown)]:px-1">
+                      Phone
+                    </label>
+                  </div>
+
+                  {/* Save info */}
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={saveInfo}
+                      onChange={(e) => setSaveInfo(e.target.checked)}
+                      className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                    />
+                    <span className="text-sm text-gray-700">Save this information for next time</span>
+                  </label>
+                </div>
+              </div>
+
+              {/* Shipping Method */}
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900 mb-3">Shipping method</h3>
+                <div className="border border-gray-300 rounded-lg divide-y divide-gray-200">
+                  {shippingOptions.map((opt) => (
+                    <label
+                      key={opt.id}
+                      className={`flex items-center justify-between p-4 cursor-pointer hover:bg-gray-50 transition ${
+                        selectedShippingId === opt.id ? 'bg-blue-50' : ''
+                      }`}
+                      onClick={() => handleSelectShipping(opt.id)}
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
+                          selectedShippingId === opt.id ? 'border-blue-600' : 'border-gray-300'
+                        }`}>
+                          {selectedShippingId === opt.id && (
+                            <div className="w-3 h-3 rounded-full bg-blue-600" />
+                          )}
+                        </div>
+                        <div>
+                          <div className="text-sm font-medium text-gray-900">{opt.name}</div>
+                          <div className="text-xs text-gray-500">{opt.eta}</div>
+                        </div>
+                      </div>
+                      <div className="text-sm font-semibold text-gray-900">{format(opt.price)}</div>
+                    </label>
+                  ))}
+                </div>
+              </div>
+
+              {/* Payment */}
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900 mb-3">Payment</h3>
+                <div className="text-sm text-gray-600 mb-4">All transactions are secure and encrypted.</div>
+
+                <div className="border border-gray-300 rounded-lg overflow-hidden">
+                  {/* Credit Card */}
+                  <div className={`border-b border-gray-300 ${paymentMethod === 'credit' ? 'bg-blue-50' : 'bg-white'}`}>
+                    <button
+                      type="button"
+                      onClick={() => setPaymentMethod('credit')}
+                      className="w-full p-4 flex items-center justify-between text-left"
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
+                          paymentMethod === 'credit' ? 'border-blue-600' : 'border-gray-300'
+                        }`}>
+                          {paymentMethod === 'credit' && (
+                            <div className="w-3 h-3 rounded-full bg-blue-600" />
+                          )}
+                        </div>
+                        <span className="text-sm font-medium text-gray-900">Credit card</span>
+                      </div>
+                      <div className="flex items-center gap-3 text-xs font-medium text-gray-600">
+                        <span>Visa</span>
+                        <span>•</span>
+                        <span>Mastercard</span>
+                        <span>•</span>
+                        <span>Amex</span>
+                      </div>
+                    </button>
+
+                    {paymentMethod === 'credit' && (
+                      <div className="px-4 pb-4 space-y-3 bg-white">
+                        <div className="relative">
+                          <input
+                            value={cardNumber}
+                            onChange={(e) => setCardNumber(e.target.value)}
+                            placeholder=" "
+                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none peer transition"
+                          />
+                          <label className="absolute left-4 top-3 text-gray-500 transition-all peer-focus:-top-2 peer-focus:text-xs peer-focus:bg-white peer-focus:px-1 peer-[:not(:placeholder-shown)]:-top-2 peer-[:not(:placeholder-shown)]:text-xs peer-[:not(:placeholder-shown)]:bg-white peer-[:not(:placeholder-shown)]:px-1">
+                            Card number
+                          </label>
+                        </div>
+                        <div className="relative">
+                          <input
+                            value={cardName}
+                            onChange={(e) => setCardName(e.target.value)}
+                            placeholder=" "
+                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none peer transition"
+                          />
+                          <label className="absolute left-4 top-3 text-gray-500 transition-all peer-focus:-top-2 peer-focus:text-xs peer-focus:bg-white peer-focus:px-1 peer-[:not(:placeholder-shown)]:-top-2 peer-[:not(:placeholder-shown)]:text-xs peer-[:not(:placeholder-shown)]:bg-white peer-[:not(:placeholder-shown)]:px-1">
+                            Name on card
+                          </label>
+                        </div>
+                        <div className="grid grid-cols-2 gap-3">
+                          <div className="relative">
+                            <input
+                              value={cardExpiry}
+                              onChange={(e) => setCardExpiry(e.target.value)}
+                              placeholder=" "
+                              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none peer transition"
+                            />
+                            <label className="absolute left-4 top-3 text-gray-500 transition-all peer-focus:-top-2 peer-focus:text-xs peer-focus:bg-white peer-focus:px-1 peer-[:not(:placeholder-shown)]:-top-2 peer-[:not(:placeholder-shown)]:text-xs peer-[:not(:placeholder-shown)]:bg-white peer-[:not(:placeholder-shown)]:px-1">
+                              Expiration date (MM / YY)
+                            </label>
+                          </div>
+                          <div className="relative">
+                            <input
+                              value={cardCvc}
+                              onChange={(e) => setCardCvc(e.target.value)}
+                              placeholder=" "
+                              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none peer transition"
+                            />
+                            <label className="absolute left-4 top-3 text-gray-500 transition-all peer-focus:-top-2 peer-focus:text-xs peer-focus:bg-white peer-focus:px-1 peer-[:not(:placeholder-shown)]:-top-2 peer-[:not(:placeholder-shown)]:text-xs peer-[:not(:placeholder-shown)]:bg-white peer-[:not(:placeholder-shown)]:px-1">
+                              Security code
+                            </label>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* PayPal */}
+                  <div className={`border-b border-gray-300 ${paymentMethod === 'paypal' ? 'bg-blue-50' : 'bg-white'}`}>
+                    <button
+                      type="button"
+                      onClick={() => setPaymentMethod('paypal')}
+                      className="w-full p-4 flex items-center justify-between text-left"
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
+                          paymentMethod === 'paypal' ? 'border-blue-600' : 'border-gray-300'
+                        }`}>
+                          {paymentMethod === 'paypal' && (
+                            <div className="w-3 h-3 rounded-full bg-blue-600" />
+                          )}
+                        </div>
+                        <span className="text-sm font-medium text-gray-900">PayPal</span>
+                      </div>
+                    </button>
+                  </div>
+
+                  {/* Coinbase */}
+                  <div className={paymentMethod === 'coinbase' ? 'bg-blue-50' : 'bg-white'}>
+                    <button
+                      type="button"
+                      onClick={() => setPaymentMethod('coinbase')}
+                      className="w-full p-4 flex items-center justify-between text-left"
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
+                          paymentMethod === 'coinbase' ? 'border-blue-600' : 'border-gray-300'
+                        }`}>
+                          {paymentMethod === 'coinbase' && (
+                            <div className="w-3 h-3 rounded-full bg-blue-600" />
+                          )}
+                        </div>
+                        <span className="text-sm font-medium text-gray-900">Crypto (Coinbase Commerce)</span>
+                      </div>
+                    </button>
                   </div>
                 </div>
-              ))}
-            </div>
+              </div>
 
-            {/* Discount Code */}
-            <div className="mb-6">
-              <h3 className="font-semibold mb-3">Discount code or gift card</h3>
-              <div className="flex gap-2">
-                <input
-                  type="text"
-                  value={discountCode}
-                  onChange={(e) => setDiscountCode(e.target.value)}
-                  placeholder="Discount code or gift card"
-                  className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#3b82f6] focus:border-transparent outline-none"
-                />
-                <button className="bg-gray-200 text-gray-700 px-6 py-3 rounded-lg font-semibold hover:bg-gray-300 transition">
-                  Submit
-                </button>
+              {/* Billing Address */}
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900 mb-3">Billing address</h3>
+                <div className="border border-gray-300 rounded-lg divide-y divide-gray-200">
+                  <label className={`flex items-center p-4 cursor-pointer hover:bg-gray-50 transition ${useSameAddress ? 'bg-blue-50' : ''}`}>
+                    <input
+                      type="radio"
+                      checked={useSameAddress}
+                      onChange={() => setUseSameAddress(true)}
+                      className="w-5 h-5 text-blue-600 focus:ring-blue-500"
+                    />
+                    <span className="ml-3 text-sm text-gray-900">Same as shipping address</span>
+                  </label>
+                  <label className={`flex items-center p-4 cursor-pointer hover:bg-gray-50 transition ${!useSameAddress ? 'bg-blue-50' : ''}`}>
+                    <input
+                      type="radio"
+                      checked={!useSameAddress}
+                      onChange={() => setUseSameAddress(false)}
+                      className="w-5 h-5 text-blue-600 focus:ring-blue-500"
+                    />
+                    <span className="ml-3 text-sm text-gray-900">Use a different billing address</span>
+                  </label>
+                </div>
               </div>
-            </div>
 
-            {/* Cost Summary */}
-            <div className="space-y-3 mb-6 pb-6 border-b">
-              <div className="flex justify-between text-gray-700">
-                <span>Subtotal</span>
-                <span className="font-semibold">${subtotal.toFixed(2)}</span>
-              </div>
-              <div className="flex justify-between text-gray-700">
-                <span>Shipping</span>
-                <span className="text-sm text-gray-500">Enter shipping address</span>
-              </div>
-            </div>
+              {/* Pay Now Button */}
+              <button
+                type="submit"
+                disabled={isLoading}
+                className={`w-full font-semibold py-4 px-6 rounded-lg transition text-lg ${
+                  isLoading 
+                    ? 'bg-gray-400 text-gray-200 cursor-not-allowed' 
+                    : 'bg-blue-600 hover:bg-blue-700 text-white'
+                }`}
+              >
+                {isLoading ? 'Processing...' : 'Pay now'}
+              </button>
 
-            <div className="flex justify-between items-center mb-2">
-              <span className="text-xl font-bold">Total</span>
-              <div className="text-right">
-                <span className="text-sm text-gray-500 mr-2">USD</span>
-                <span className="text-2xl font-bold">${subtotal.toFixed(2)}</span>
+              {/* Footer Links */}
+              <div className="pt-6 border-t border-gray-200">
+                <div className="flex items-center justify-center gap-4 text-xs text-gray-500">
+                  <Link href="/refund-policy" className="hover:text-gray-700">Refund policy</Link>
+                  <span>•</span>
+                  <Link href="/privacy-policy" className="hover:text-gray-700">Privacy policy</Link>
+                  <span>•</span>
+                  <Link href="/terms-of-service" className="hover:text-gray-700">Terms of service</Link>
+                </div>
               </div>
-            </div>
-
-            {savings > 0 && (
-              <div className="bg-green-50 border border-green-200 rounded-lg p-3 mt-4">
-                <p className="text-green-700 font-semibold text-center">
-                  TOTAL SAVINGS ${savings.toFixed(2)}
-                </p>
-              </div>
-            )}
+            </form>
           </div>
+
+          {/* Right Column - Order Summary (lg:col-span-5) */}
+          <aside className="lg:col-span-5">
+            <div className="lg:sticky lg:top-6 bg-gray-50 border-l border-gray-200 lg:pl-8 lg:-mr-8 lg:pr-8 py-6">
+              {/* Products */}
+              <div className="space-y-4 mb-6">
+                {itemsToUse.length === 0 ? (
+                  <div className="text-sm text-gray-500 text-center py-8">Your cart is empty</div>
+                ) : (
+                  <>
+                    {testMode && items.length === 0 && (
+                      <div className="bg-green-50 border border-green-200 rounded p-2 mb-2">
+                        <p className="text-xs font-semibold text-green-700">🧪 Test Mode - Using Sample Product</p>
+                      </div>
+                    )}
+                    {itemsToUse.map((item: any) => (
+                      <div key={item.id} className="flex gap-4">
+                        <div className="relative flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden border border-gray-300 bg-white">
+                          <Image
+                            src={item.image || '/ref/logo.png'}
+                            alt={item.name}
+                            fill
+                            sizes="64px"
+                            className="object-cover"
+                          />
+                          <div className="absolute -top-2 -right-2 w-6 h-6 bg-gray-600 text-white text-xs rounded-full flex items-center justify-center font-semibold">
+                            {item.quantity}
+                          </div>
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="text-sm font-medium text-gray-900 mb-1">{item.name}</div>
+                          {item.size && <div className="text-xs text-gray-500">Size: {item.size}</div>}
+                        </div>
+                        <div className="text-sm font-semibold text-gray-900">
+                          {format((item.discount_price ?? item.price) * item.quantity)}
+                        </div>
+                      </div>
+                    ))}
+                  </>
+                )}
+              </div>
+
+              {/* Discount Code */}
+              <div className="mb-6">
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={discountCode}
+                    onChange={(e) => setDiscountCode(e.target.value)}
+                    placeholder="Discount code"
+                    className="flex-1 px-4 py-3 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                  />
+                  <button
+                    type="button"
+                    className="px-5 py-3 bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium rounded-lg text-sm transition"
+                  >
+                    Apply
+                  </button>
+                </div>
+              </div>
+
+              {/* Totals */}
+              <div className="space-y-3 pb-4 border-b border-gray-300">
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-600">Subtotal</span>
+                  <span className="font-medium text-gray-900">{format(subtotal)}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-600">Shipping</span>
+                  <span className="font-medium text-gray-900">
+                    {selectedShipping ? format(selectedShipping.price) : '—'}
+                  </span>
+                </div>
+                {shippingProtection && protection > 0 && (
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-600">Shipping Protection</span>
+                    <span className="font-medium text-gray-900">{format(protection)}</span>
+                  </div>
+                )}
+              </div>
+
+              {/* Total */}
+              <div className="pt-4">
+                <div className="flex justify-between items-baseline mb-1">
+                  <span className="text-sm text-gray-600">Total</span>
+                  <div className="text-right">
+                    <div className="text-xs text-gray-500 mb-1">USD</div>
+                    <div className="text-2xl font-bold text-gray-900">{format(total)}</div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Savings Badge */}
+              {savings > 0 && (
+                <div className="mt-4 bg-green-50 border border-green-200 rounded-lg p-3">
+                  <div className="text-sm font-medium text-green-800">
+                    🎉 You're saving {format(savings)}!
+                  </div>
+                </div>
+              )}
+            </div>
+          </aside>
         </div>
       </div>
+
+      {/* Footer */}
+      <footer className="bg-white border-t border-gray-200 mt-12">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+          <div className="flex items-center justify-center gap-2 text-xs text-gray-500">
+            <Lock className="w-3 h-3" />
+            <span>All transactions are secure and encrypted</span>
+          </div>
+        </div>
+      </footer>
     </div>
   )
 }

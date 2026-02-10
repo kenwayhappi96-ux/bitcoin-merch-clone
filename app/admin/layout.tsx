@@ -88,29 +88,12 @@ export default function AdminLayout({
       href: '/admin/orders',
       description: 'Voir toutes les commandes',
     },
-    {
-      icon: ImageIcon,
-      label: 'Carousel',
-      href: '/admin/carousel',
-      description: 'Images de la homepage',
-    },
-    {
-      icon: Star,
-      label: 'Avis',
-      href: '/admin/reviews',
-      description: 'Modérer les reviews',
-    },
+
     {
       icon: User,
       label: 'Profil',
       href: '/admin/profile',
       description: 'Modifier le profil',
-    },
-    {
-      icon: Settings,
-      label: 'Paramètres',
-      href: '/admin/settings',
-      description: 'Configuration du site',
     },
   ]
 

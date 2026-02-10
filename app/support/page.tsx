@@ -1,201 +1,202 @@
 'use client'
 
-import { Phone, Mail, MessageCircle, MapPin, Clock } from 'lucide-react'
 import { useState } from 'react'
 
-export default function SupportPage() {
+export default function ContactPage() {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
     message: ''
   })
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = (e) => {
     e.preventDefault()
     console.log('Form submitted:', formData)
   }
 
   return (
-    <main className="min-h-screen bg-gray-50">
-      {/* Hero Section */}
-      <div className="bg-gradient-to-r from-[#3b82f6] to-[#2563eb] text-white py-16 px-4">
-        <div className="max-w-7xl mx-auto text-center">
-          <h1 className="text-4xl md:text-5xl font-bold mb-4">Contact Us</h1>
-          <p className="text-xl text-blue-100 max-w-3xl mx-auto">
-            Need help with an order, product, or visit? Our support team is available through the options below.
-          </p>
-        </div>
-      </div>
-
-      <div className="max-w-7xl mx-auto px-4 py-12">
-        {/* Contact Methods */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-          {/* Call Us */}
-          <div className="bg-white rounded-lg shadow-md p-8 text-center hover:shadow-lg transition">
-            <div className="text-5xl mb-4">📞</div>
-            <h3 className="text-xl font-bold text-gray-800 mb-2">Call Us</h3>
-            <p className="text-2xl font-bold text-[#3b82f6] mb-2">(877) 5000-BTC</p>
-            <p className="text-sm text-gray-600 mb-4">Fastest support</p>
-            <a
-              href="tel:8775000282"
-              className="inline-block bg-[#3b82f6] text-white px-6 py-2 rounded-lg font-semibold hover:bg-[#2563eb] transition"
-            >
-              Call Now
-            </a>
-          </div>
-
-          {/* Email Support */}
-          <div className="bg-white rounded-lg shadow-md p-8 text-center hover:shadow-lg transition">
-            <div className="text-5xl mb-4">✉️</div>
-            <h3 className="text-xl font-bold text-gray-800 mb-2">Email Support</h3>
-            <p className="text-lg font-semibold text-gray-700 mb-2">support@bitcoinmerch.com</p>
-            <p className="text-sm text-gray-600 mb-4">Response within 24 hours</p>
-            <a
-              href="mailto:support@bitcoinmerch.com"
-              className="inline-block bg-green-600 text-white px-6 py-2 rounded-lg font-semibold hover:bg-green-700 transition"
-            >
-              Send Email
-            </a>
-          </div>
-
-          {/* Chat & Telegram */}
-          <div className="bg-white rounded-lg shadow-md p-8 text-center hover:shadow-lg transition">
-            <div className="text-5xl mb-4">💬</div>
-            <h3 className="text-xl font-bold text-gray-800 mb-2">Chat & Telegram</h3>
-            <p className="text-lg font-semibold text-gray-700 mb-2">Live chat or join our community</p>
-            <p className="text-sm text-gray-600 mb-4">&nbsp;</p>
-            <a
-              href="https://t.me/bitcoinmerch"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-block bg-purple-600 text-white px-6 py-2 rounded-lg font-semibold hover:bg-purple-700 transition"
-            >
-              Join Telegram
-            </a>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
-          {/* Left Column - Hours & Location */}
-          <div className="space-y-8">
-            {/* Support Hours */}
-            <div className="bg-white rounded-lg shadow-md p-8">
-              <div className="flex items-center gap-3 mb-6">
-                <Clock className="w-8 h-8 text-[#3b82f6]" />
-                <h2 className="text-2xl font-bold text-gray-800">Customer Support Hours</h2>
-              </div>
-              <div className="space-y-3 text-gray-700">
-                <div className="flex justify-between items-center py-2 border-b">
-                  <span className="font-semibold">Monday – Friday:</span>
-                  <span>24 hours</span>
-                </div>
-                <div className="flex justify-between items-center py-2">
-                  <span className="font-semibold">Saturday – Sunday:</span>
-                  <span>9:00 AM – 5:00 PM</span>
-                </div>
-              </div>
-              <p className="text-sm text-gray-500 mt-4 italic">All hours shown in Pacific Time.</p>
+    <main className="min-h-screen bg-white">
+      {/* Header */}
+      <section className="py-12 px-6">
+        <div className="max-w-4xl mx-auto">
+          <h1 className="text-4xl font-bold text-center mb-12" style={{ color: '#ff9900' }}>Contact Us</h1>
+          
+          {/* Visit Us Section */}
+          <div className="text-center mb-12">
+            <h2 className="text-2xl font-bold mb-3" style={{ color: '#ff9900' }}>
+              <a href="https://bitcoinmerch.com/pages/bitcoinmerchstorefront" target="_blank" rel="noopener" className="hover:underline">
+                Visit Us In Person
+              </a>
+            </h2>
+            <p className="text-gray-800 mb-4">See our products in person, get expert guidance, or pick up merchandise. Appointment required.</p>
+            
+            <address className="not-italic text-gray-800 mb-4">
+              <strong>Bitcoin Merch Gallery</strong><br />
+              21620 Lassen St<br />
+              Chatsworth, CA 91311
+            </address>
+            
+            <p className="text-gray-800 mb-6">
+              <strong>Gallery Hours:</strong><br />
+              Monday – Friday: 9:00 AM – 5:00 PM<br />
+              Saturday &amp; Sunday: Closed
+            </p>
+            
+            {/* Map */}
+            <div className="rounded-xl overflow-hidden shadow-lg mb-8">
+              <iframe 
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3308.807657320247!2d-118.60086712372146!3d34.25171147306913!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x80c296a37e5cc4b7%3A0x9d5f9b314b5c80c1!2s21620%20Lassen%20St%2C%20Chatsworth%2C%20CA%2091311%2C%20USA!5e0!3m2!1sen!2sus!4v1700000000000!5m2!1sen!2sus" 
+                width="100%" 
+                height="350" 
+                style={{ border: 0 }} 
+                loading="lazy"
+              />
             </div>
-
-            {/* Visit Us */}
-            <div className="bg-white rounded-lg shadow-md p-8">
-              <div className="flex items-center gap-3 mb-6">
-                <MapPin className="w-8 h-8 text-[#3b82f6]" />
-                <h2 className="text-2xl font-bold text-gray-800">Visit Us In Person</h2>
-              </div>
-              <p className="text-gray-600 mb-6">
-                See our products in person, get expert guidance, or pick up merchandise. Appointment required.
+            
+            <h2 className="text-2xl font-bold mb-8" style={{ color: '#ff9900' }}>
+              Need help with an order, product, or visit? Our support team is available through the options below.
+            </h2>
+          </div>
+          
+          {/* Contact Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+            <div className="bg-white p-7 rounded-2xl shadow-lg text-center">
+              <div className="text-4xl mb-3">📞</div>
+              <h3 className="text-xl font-bold mb-2" style={{ color: '#ff9900' }}>Call Us</h3>
+              <p className="text-gray-800 mb-4">
+                (877) 5000-BTC<br />
+                Fastest support
               </p>
-              <div className="space-y-4">
-                <div>
-                  <h3 className="font-bold text-lg text-gray-800 mb-2">Bitcoin Merch Gallery</h3>
-                  <p className="text-gray-700">
-                    21620 Lassen St<br />
-                    Chatsworth, CA 91311
-                  </p>
-                </div>
-                <div>
-                  <h4 className="font-semibold text-gray-800 mb-2">Gallery Hours:</h4>
-                  <div className="text-gray-700 space-y-1">
-                    <p>Monday – Friday: 9:00 AM – 5:00 PM</p>
-                    <p>Saturday & Sunday: Closed</p>
-                  </div>
-                </div>
-              </div>
+              <a 
+                href="tel:+18775000282" 
+                className="inline-block mt-3 px-5 py-2 rounded-lg text-white font-semibold hover:opacity-90"
+                style={{ backgroundColor: '#ff9900' }}
+              >
+                Call Now
+              </a>
+            </div>
+            
+            <div className="bg-white p-7 rounded-2xl shadow-lg text-center">
+              <div className="text-4xl mb-3">✉️</div>
+              <h3 className="text-xl font-bold mb-2" style={{ color: '#ff9900' }}>Email Support</h3>
+              <p className="text-gray-800 mb-4">
+                support@bitcoinmerch.com<br />
+                Response within 24 hours
+              </p>
+              <a 
+                href="mailto:support@bitcoinmerch.com" 
+                className="inline-block mt-3 px-5 py-2 rounded-lg text-white font-semibold hover:opacity-90"
+                style={{ backgroundColor: '#ff9900' }}
+              >
+                Send Email
+              </a>
+            </div>
+            
+            <div className="bg-white p-7 rounded-2xl shadow-lg text-center">
+              <div className="text-4xl mb-3">💬</div>
+              <h3 className="text-xl font-bold mb-2" style={{ color: '#ff9900' }}>Chat &amp; Telegram</h3>
+              <p className="text-gray-800 mb-4">
+                Live chat or join our community
+              </p>
+              <a 
+                href="https://t.me/+VXFU4LuGLaxiZjBh" 
+                target="_blank" 
+                rel="noopener"
+                className="inline-block mt-3 px-5 py-2 rounded-lg text-white font-semibold hover:opacity-90"
+                style={{ backgroundColor: '#ff9900' }}
+              >
+                Join Telegram
+              </a>
             </div>
           </div>
-
-          {/* Right Column - Map */}
-          <div className="bg-white rounded-lg shadow-md overflow-hidden">
-            <iframe
-              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3298.7194890367486!2d-118.61437!3d34.257!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x80c29b5e1e5e5e5e%3A0x1e5e5e5e5e5e5e5e!2s21620%20Lassen%20St%2C%20Chatsworth%2C%20CA%2091311!5e0!3m2!1sen!2sus!4v1234567890"
-              width="100%"
-              height="100%"
-              style={{ border: 0, minHeight: '500px' }}
-              allowFullScreen
-              loading="lazy"
-              referrerPolicy="no-referrer-when-downgrade"
-            ></iframe>
+          
+          {/* Support Hours */}
+          <div className="text-center mb-12">
+            <h2 className="text-2xl font-bold mb-6" style={{ color: '#ff9900' }}>Customer Support Hours</h2>
+            <div className="bg-white p-6 rounded-xl shadow-md max-w-lg mx-auto">
+              <p className="text-gray-800 mb-2">
+                <strong>Monday – Friday:</strong> 24 hours
+              </p>
+              <p className="text-gray-800 mb-2">
+                <strong>Saturday – Sunday:</strong> 9:00 AM – 5:00 PM
+              </p>
+              <p className="text-gray-800">All hours shown in Pacific Time.</p>
+            </div>
           </div>
         </div>
+      </section>
 
-        {/* Contact Form */}
-        <div className="bg-white rounded-lg shadow-md p-8">
-          <form onSubmit={handleSubmit} className="max-w-2xl mx-auto space-y-6">
-            <div>
-              <label htmlFor="name" className="block text-sm font-semibold text-gray-700 mb-2">
-                Your name
-              </label>
-              <input
-                type="text"
-                id="name"
-                value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#3b82f6] focus:border-transparent outline-none transition"
-                placeholder="Enter your name"
-                required
-              />
+      {/* Contact Form */}
+      <section className="py-16 px-6 bg-gray-50">
+        <div className="max-w-5xl mx-auto">
+          <div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+              <div className="relative">
+                <input
+                  type="text"
+                  id="contact-form-name"
+                  value={formData.name}
+                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  className="w-full px-4 pt-6 pb-2 border border-gray-300 rounded focus:border-black focus:outline-none peer"
+                  placeholder=" "
+                  required
+                />
+                <label
+                  htmlFor="contact-form-name"
+                  className="absolute left-4 top-4 text-gray-500 transition-all pointer-events-none peer-placeholder-shown:top-4 peer-placeholder-shown:text-base peer-focus:top-2 peer-focus:text-xs peer-[:not(:placeholder-shown)]:top-2 peer-[:not(:placeholder-shown)]:text-xs"
+                >
+                  Your name
+                </label>
+              </div>
+
+              <div className="relative">
+                <input
+                  type="email"
+                  id="contact-form-email"
+                  value={formData.email}
+                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                  className="w-full px-4 pt-6 pb-2 border border-gray-300 rounded focus:border-black focus:outline-none peer"
+                  placeholder=" "
+                  required
+                />
+                <label
+                  htmlFor="contact-form-email"
+                  className="absolute left-4 top-4 text-gray-500 transition-all pointer-events-none peer-placeholder-shown:top-4 peer-placeholder-shown:text-base peer-focus:top-2 peer-focus:text-xs peer-[:not(:placeholder-shown)]:top-2 peer-[:not(:placeholder-shown)]:text-xs"
+                >
+                  Your email
+                </label>
+              </div>
             </div>
 
-            <div>
-              <label htmlFor="email" className="block text-sm font-semibold text-gray-700 mb-2">
-                Your email
-              </label>
-              <input
-                type="email"
-                id="email"
-                value={formData.email}
-                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#3b82f6] focus:border-transparent outline-none transition"
-                placeholder="Enter your email"
-                required
-              />
-            </div>
-
-            <div>
-              <label htmlFor="message" className="block text-sm font-semibold text-gray-700 mb-2">
-                Your message
-              </label>
+            <div className="relative mb-6">
               <textarea
-                id="message"
+                id="contact-form-message"
                 value={formData.message}
                 onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                rows={6}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#3b82f6] focus:border-transparent outline-none transition resize-none"
-                placeholder="How can we help you?"
+                rows={8}
+                className="w-full px-4 pt-6 pb-2 border border-gray-300 rounded focus:border-black focus:outline-none resize-none peer"
+                placeholder=" "
                 required
               />
+              <label
+                htmlFor="contact-form-message"
+                className="absolute left-4 top-4 text-gray-500 transition-all pointer-events-none peer-placeholder-shown:top-4 peer-placeholder-shown:text-base peer-focus:top-2 peer-focus:text-xs peer-[:not(:placeholder-shown)]:top-2 peer-[:not(:placeholder-shown)]:text-xs"
+              >
+                Your message
+              </label>
             </div>
 
-            <button
-              type="submit"
-              className="w-full bg-[#3b82f6] text-white py-3 rounded-lg font-semibold hover:bg-[#2563eb] transition"
-            >
-              Send message
-            </button>
-          </form>
+            <div className="text-center">
+              <button
+                onClick={handleSubmit}
+                className="bg-black text-white px-12 py-3 rounded hover:bg-gray-800 transition font-semibold min-w-[200px]"
+              >
+                Send message
+              </button>
+            </div>
+          </div>
         </div>
-      </div>
+      </section>
     </main>
   )
 }

@@ -41,9 +41,12 @@ export interface Category {
 // Types pour le panier
 export interface CartItem {
   id: number
-  product: Product
-  quantity: number
+  name: string
   price: number
+  discount_price?: number
+  quantity: number
+  image?: string
+  product?: Product
 }
 
 export interface Cart {
@@ -51,6 +54,46 @@ export interface Cart {
   subtotal: number
   shipping: number
   tax: number
+  total: number
+}
+
+// Types pour les commandes
+export interface Order {
+  id: number
+  order_number: string
+  email: string
+  first_name: string
+  last_name: string
+  address: string
+  apartment?: string
+  city: string
+  state?: string
+  postal_code: string
+  country: string
+  phone: string
+  company?: string
+  shipping_method: string
+  shipping_cost: number
+  protection_fee?: number
+  protection_enabled: boolean
+  subtotal: number
+  total: number
+  notes?: string
+  payment_method: string
+  payment_status: 'pending' | 'completed' | 'failed'
+  order_status: 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled'
+  created_at: string
+  updated_at: string
+}
+
+export interface OrderItem {
+  id: number
+  order_id: number
+  product_id: number
+  product_name: string
+  quantity: number
+  price: number
+  discount_price?: number
   total: number
 }
 

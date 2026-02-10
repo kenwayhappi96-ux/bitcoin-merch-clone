@@ -51,10 +51,7 @@ export default async function ProductDetailPage({
   const secondaryImages = await getProductImages(product.id)
 
   // Tous les produits pour carrousels
-  const allProductsData = await getProducts()
-  const products: Product[] = Array.isArray(allProductsData)
-    ? allProductsData
-    : allProductsData?.products ?? []
+  const products = await getProducts()
 
   // Gestion prix
   const price = product.discountPrice ?? product.price

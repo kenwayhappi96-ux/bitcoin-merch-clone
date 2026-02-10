@@ -35,17 +35,29 @@ export default function AdminDashboard() {
 
   const loadStats = async () => {
     try {
-      const [productsRes] = await Promise.all([
+      const [productsRes, ordersRes] = await Promise.all([
         fetch('/api/products'),
+        fetch('/api/orders?limit=1000'),
       ])
 
       const productsData = await productsRes.json()
-      
+      const ordersData = await ordersRes.json()
+
+      let totalOrders = 0
+      let totalRevenue = 0
+      let pendingOrders = 0
+
+      if (ordersData.success && ordersData.orders) {
+        totalOrders = ordersData.orders.length
+        totalRevenue = ordersData.orders.reduce((sum: number, order: any) => sum + Number(order.total), 0)
+        pendingOrders = ordersData.orders.filter((order: any) => order.status === 'pending').length
+      }
+
       setStats({
         products: productsData.count || 0,
-        orders: 0,
-        revenue: 0,
-        pending: 0,
+        orders: totalOrders,
+        revenue: Math.round(totalRevenue * 100) / 100,
+        pending: pendingOrders,
       })
     } catch (error) {
       console.error('Error loading stats:', error)

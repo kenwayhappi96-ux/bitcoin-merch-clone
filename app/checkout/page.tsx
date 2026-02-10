@@ -9,6 +9,11 @@ import { ChevronDown, ChevronLeft, Lock, Info } from 'lucide-react'
 export default function CheckoutPage() {
   const { items, shippingProtection, protectionFee } = useAppSelector((state: any) => state.cart)
 
+  // States supplémentaires
+  const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [testMode, setTestMode] = useState(false) // Mode test pour développement
+
   // Contact / shipping form
   const [email, setEmail] = useState('')
   const [emailNews, setEmailNews] = useState(false)
@@ -33,9 +38,13 @@ export default function CheckoutPage() {
   const [cardCvc, setCardCvc] = useState('')
   const [cardName, setCardName] = useState('')
 
-  // Totals
-  const subtotal = items.reduce((sum: number, item: any) => sum + (item.discount_price ?? item.price) * item.quantity, 0)
-  const savings = items.reduce((sum: number, item: any) => {
+  // Totals - utiliser des données de test si panier vide et mode test activé
+  const testItems = [
+    { id: 1, name: 'Test Product', price: 100, discount_price: 80, quantity: 1, image: '/test.jpg' }
+  ]
+  const itemsToUse = testMode && items.length === 0 ? testItems : items
+  const subtotal = itemsToUse.reduce((sum: number, item: any) => sum + (item.discount_price ?? item.price) * item.quantity, 0)
+  const savings = itemsToUse.reduce((sum: number, item: any) => {
     if (item.discount_price) return sum + (item.price - item.discount_price) * item.quantity
     return sum
   }, 0)
@@ -63,32 +72,94 @@ export default function CheckoutPage() {
     setSelectedShippingId(id)
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    setError(null)
+    
+    // Validation des champs requis
     if (!email) {
-      alert('Please enter an email address.')
+      setError('Email is required.')
       return
     }
-    if (items.length === 0) {
-      alert('Your cart is empty.')
+    if (!firstName) {
+      setError('First name is required.')
+      return
+    }
+    if (!lastName) {
+      setError('Last name is required.')
+      return
+    }
+    if (!address) {
+      setError('Address is required.')
+      return
+    }
+    if (!city) {
+      setError('City is required.')
+      return
+    }
+    if (!country) {
+      setError('Country is required.')
+      return
+    }
+    // ZIP code only required for specific countries
+    const countriesRequiringZip = ['United States', 'Canada', 'Germany', 'France']
+    if (countriesRequiringZip.includes(country) && !zipCode) {
+      setError('ZIP code is required for your country.')
+      return
+    }
+    // Permettre test si mode test activé
+    if (!testMode && itemsToUse.length === 0) {
+      setError('Your cart is empty.')
       return
     }
 
-    const payload = {
-      contact: { email, emailNews },
-      shippingAddress: { firstName, lastName, company, address, apartment, city, region, zipCode, country, phone },
-      shippingMethod: selectedShipping,
-      paymentMethod,
-      billingSameAsShipping: useSameAddress,
-      items,
-      shippingProtection,
-      protectionFee: protection,
-      totals: { subtotal, shipping, protection, total, savings },
-      discountCode: discountCode || null,
-    }
+    setIsLoading(true)
 
-    console.log('Order payload:', payload)
-    alert('Order prepared (demo). Integrate backend/payment gateway here.')
+    try {
+      // Créer la commande dans la base de données
+      const orderResponse = await fetch('/api/orders', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email,
+          firstName,
+          lastName,
+          address,
+          apartment,
+          city,
+          region,
+          zipCode,
+          country,
+          phone,
+          company,
+          shippingMethod: selectedShipping?.name,
+          shippingCost: shipping,
+          protectionEnabled: shippingProtection,
+          protectionFee: protection,
+          items: itemsToUse,
+          subtotal,
+          total,
+          notes: testMode ? '[TEST MODE] Test order' : '',
+          paymentMethod,
+        }),
+      })
+
+      const orderData = await orderResponse.json()
+
+      if (!orderData.success) {
+        setError(orderData.error || 'Erreur lors de la création de la commande')
+        setIsLoading(false)
+        return
+      }
+
+      // Passer au paiement Stripe (prochainement)
+      // Pour l'instant, rediriger vers une page de confirmation
+      window.location.href = `/order-confirmation?orderId=${orderData.orderId}&orderNumber=${orderData.orderNumber}`
+    } catch (err) {
+      setError('Erreur réseau. Veuillez réessayer.')
+      console.error('Checkout error:', err)
+      setIsLoading(false)
+    }
   }
 
   return (
@@ -109,14 +180,34 @@ export default function CheckoutPage() {
           {/* Left Column - Checkout Form (lg:col-span-7) */}
           <div className="lg:col-span-7">
             {/* Breadcrumb */}
-            <div className="mb-6">
+            <div className="mb-6 flex items-center justify-between">
               <Link href="/cart" className="inline-flex items-center text-sm text-blue-600 hover:text-blue-700">
                 <ChevronLeft className="w-4 h-4 mr-1" />
                 Show order summary
               </Link>
+              {/* Test Mode Button */}
+              {process.env.NODE_ENV === 'development' && (
+                <button
+                  type="button"
+                  onClick={() => setTestMode(!testMode)}
+                  className={`text-xs px-3 py-1 rounded font-medium transition ${
+                    testMode
+                      ? 'bg-green-100 text-green-700 border border-green-300'
+                      : 'bg-gray-100 text-gray-600 border border-gray-300'
+                  }`}
+                >
+                  {testMode ? '✓ Test Mode ON' : 'Test Mode OFF'}
+                </button>
+              )}
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-6">
+              {/* Error Message */}
+              {error && (
+                <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+                  <p className="text-sm text-red-600">{error}</p>
+                </div>
+              )}
               {/* Express Checkout Options */}
               <div className="space-y-3">
                 <h2 className="text-xl font-semibold text-gray-900">Express checkout</h2>
@@ -377,10 +468,12 @@ export default function CheckoutPage() {
                         </div>
                         <span className="text-sm font-medium text-gray-900">Credit card</span>
                       </div>
-                      <div className="flex items-center gap-2">
-                        <Image src="/icons/visa.svg" alt="Visa" width={32} height={20} className="h-5 w-auto" onError={(e) => e.currentTarget.style.display = 'none'} />
-                        <Image src="/icons/mastercard.svg" alt="Mastercard" width={32} height={20} className="h-5 w-auto" onError={(e) => e.currentTarget.style.display = 'none'} />
-                        <Image src="/icons/amex.svg" alt="Amex" width={32} height={20} className="h-5 w-auto" onError={(e) => e.currentTarget.style.display = 'none'} />
+                      <div className="flex items-center gap-3 text-xs font-medium text-gray-600">
+                        <span>Visa</span>
+                        <span>•</span>
+                        <span>Mastercard</span>
+                        <span>•</span>
+                        <span>Amex</span>
                       </div>
                     </button>
 
@@ -506,9 +599,14 @@ export default function CheckoutPage() {
               {/* Pay Now Button */}
               <button
                 type="submit"
-                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-4 px-6 rounded-lg transition text-lg"
+                disabled={isLoading}
+                className={`w-full font-semibold py-4 px-6 rounded-lg transition text-lg ${
+                  isLoading 
+                    ? 'bg-gray-400 text-gray-200 cursor-not-allowed' 
+                    : 'bg-blue-600 hover:bg-blue-700 text-white'
+                }`}
               >
-                Pay now
+                {isLoading ? 'Processing...' : 'Pay now'}
               </button>
 
               {/* Footer Links */}
@@ -529,32 +627,39 @@ export default function CheckoutPage() {
             <div className="lg:sticky lg:top-6 bg-gray-50 border-l border-gray-200 lg:pl-8 lg:-mr-8 lg:pr-8 py-6">
               {/* Products */}
               <div className="space-y-4 mb-6">
-                {items.length === 0 ? (
+                {itemsToUse.length === 0 ? (
                   <div className="text-sm text-gray-500 text-center py-8">Your cart is empty</div>
                 ) : (
-                  items.map((item: any) => (
-                    <div key={item.id} className="flex gap-4">
-                      <div className="relative flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden border border-gray-300 bg-white">
-                        <Image
-                          src={item.image || '/ref/logo.png'}
-                          alt={item.name}
-                          fill
-                          sizes="64px"
-                          className="object-cover"
-                        />
-                        <div className="absolute -top-2 -right-2 w-6 h-6 bg-gray-600 text-white text-xs rounded-full flex items-center justify-center font-semibold">
-                          {item.quantity}
+                  <>
+                    {testMode && items.length === 0 && (
+                      <div className="bg-green-50 border border-green-200 rounded p-2 mb-2">
+                        <p className="text-xs font-semibold text-green-700">🧪 Test Mode - Using Sample Product</p>
+                      </div>
+                    )}
+                    {itemsToUse.map((item: any) => (
+                      <div key={item.id} className="flex gap-4">
+                        <div className="relative flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden border border-gray-300 bg-white">
+                          <Image
+                            src={item.image || '/ref/logo.png'}
+                            alt={item.name}
+                            fill
+                            sizes="64px"
+                            className="object-cover"
+                          />
+                          <div className="absolute -top-2 -right-2 w-6 h-6 bg-gray-600 text-white text-xs rounded-full flex items-center justify-center font-semibold">
+                            {item.quantity}
+                          </div>
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="text-sm font-medium text-gray-900 mb-1">{item.name}</div>
+                          {item.size && <div className="text-xs text-gray-500">Size: {item.size}</div>}
+                        </div>
+                        <div className="text-sm font-semibold text-gray-900">
+                          {format((item.discount_price ?? item.price) * item.quantity)}
                         </div>
                       </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="text-sm font-medium text-gray-900 mb-1">{item.name}</div>
-                        {item.size && <div className="text-xs text-gray-500">Size: {item.size}</div>}
-                      </div>
-                      <div className="text-sm font-semibold text-gray-900">
-                        {format((item.discount_price ?? item.price) * item.quantity)}
-                      </div>
-                    </div>
-                  ))
+                    ))}
+                  </>
                 )}
               </div>
 

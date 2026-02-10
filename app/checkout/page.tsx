@@ -7,7 +7,7 @@ import { useAppSelector } from '@/store/hooks'
 import { ChevronDown, ChevronLeft, Lock, Info } from 'lucide-react'
 
 export default function CheckoutPage() {
-  const { items } = useAppSelector((state: any) => state.cart)
+  const { items, shippingProtection, protectionFee } = useAppSelector((state: any) => state.cart)
 
   // Contact / shipping form
   const [email, setEmail] = useState('')
@@ -54,7 +54,8 @@ export default function CheckoutPage() {
   const [selectedShippingId, setSelectedShippingId] = useState<string>(shippingOptions[0].id)
   const selectedShipping = shippingOptions.find((s) => s.id === selectedShippingId)
   const shipping = selectedShipping?.price ?? 0
-  const total = subtotal + shipping
+  const protection = shippingProtection ? protectionFee : 0
+  const total = subtotal + shipping + protection
 
   const format = (v: number) => v.toLocaleString('en-US', { style: 'currency', currency: 'USD' })
 
@@ -80,7 +81,9 @@ export default function CheckoutPage() {
       paymentMethod,
       billingSameAsShipping: useSameAddress,
       items,
-      totals: { subtotal, shipping, total, savings },
+      shippingProtection,
+      protectionFee: protection,
+      totals: { subtotal, shipping, protection, total, savings },
       discountCode: discountCode || null,
     }
 
@@ -586,6 +589,12 @@ export default function CheckoutPage() {
                     {selectedShipping ? format(selectedShipping.price) : '—'}
                   </span>
                 </div>
+                {shippingProtection && protection > 0 && (
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-600">Shipping Protection</span>
+                    <span className="font-medium text-gray-900">{format(protection)}</span>
+                  </div>
+                )}
               </div>
 
               {/* Total */}

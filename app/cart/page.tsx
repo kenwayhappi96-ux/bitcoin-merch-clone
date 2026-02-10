@@ -4,23 +4,22 @@ import { Minus, Plus, Trash2 } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useAppDispatch, useAppSelector } from '@/store/hooks'
-import { removeFromCart, updateQuantity } from '@/store/cartSlice'
+import { removeFromCart, updateQuantity, toggleShippingProtection } from '@/store/cartSlice'
 import { useState } from 'react'
 
 export default function CartPage() {
   const dispatch = useAppDispatch()
-  const { items } = useAppSelector((state) => state.cart)
+  const { items, shippingProtection, protectionFee } = useAppSelector((state) => state.cart)
 
-  const [shippingProtection, setShippingProtection] = useState(true)
   const [orderInstructions, setOrderInstructions] = useState('')
 
   const subtotal = items.reduce((sum, item) => sum + (item.discount_price || item.price) * item.quantity, 0)
   const originalTotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0)
   const saved = originalTotal - subtotal
 
-  // Protection à 13.50 (en € pour cohérence avec le reste)
-  const protectionFee = shippingProtection ? 13.50 : 0
-  const total = subtotal + protectionFee
+  // Protection fee depuis Redux
+  const protection = shippingProtection ? protectionFee : 0
+  const total = subtotal + protection
 
   // Debug optionnel : voir les changements
   // useEffect(() => {
@@ -180,7 +179,7 @@ export default function CartPage() {
                     <input
                       type="checkbox"
                       checked={shippingProtection}
-                      onChange={(e) => setShippingProtection(e.target.checked)}
+                      onChange={() => dispatch(toggleShippingProtection())}
                       className="mt-1 w-5 h-5 text-[#3b82f6] rounded"
                     />
                     <div className="flex-1">
